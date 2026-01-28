@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/postsFragment">
+
+    <!-- Основные фрагменты -->
+    <fragment
+        android:id="@+id/postsFragment"
+        android:name="ru.netology.nework.ui.PostsFragment"
+        android:label="@string/posts"
+        tools:layout="@layout/fragment_posts" />
+
+    <fragment
+        android:id="@+id/eventsFragment"
+        android:name="ru.netology.nework.ui.EventsFragment"
+        android:label="@string/events"
+        tools:layout="@layout/fragment_events" />
+
+    <fragment
+        android:id="@+id/usersFragment"
+        android:name="ru.netology.nework.ui.UsersFragment"
+        android:label="@string/users"
+        tools:layout="@layout/fragment_users" />
+
+    <!-- Детальные экраны -->
+    <fragment
+        android:id="@+id/postDetailFragment"
+        android:name="ru.netology.nework.ui.PostDetailFragment"
+        android:label="Post Details"
+        tools:layout="@layout/fragment_post_detail" />
+
+    <fragment
+        android:id="@+id/eventDetailFragment"
+        android:name="ru.netology.nework.ui.EventDetailFragment"
+        android:label="Event Details"
+        tools:layout="@layout/fragment_event_detail" />
+
+    <fragment
+        android:id="@+id/userProfileFragment"
+        android:name="ru.netology.nework.ui.UserProfileFragment"
+        android:label="User Profile"
+        tools:layout="@layout/fragment_user_profile" />
+
+    <!-- Создание/редактирование -->
+    <fragment
+        android:id="@+id/newPostFragment"
+        android:name="ru.netology.nework.ui.NewPostFragment"
+        android:label="New Post"
+        tools:layout="@layout/fragment_new_post" />
+
+    <fragment
+        android:id="@+id/newEventFragment"
+        android:name="ru.netology.nework.ui.NewEventFragment"
+        android:label="New Event"
+        tools:layout="@layout/fragment_new_event" />
+
+    <!-- Авторизация -->
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="ru.netology.nework.ui.SignInFragment"
+        android:label="Sign In"
+        tools:layout="@layout/fragment_sign_in" />
+
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:name="ru.netology.nework.ui.SignUpFragment"
+        android:label="Sign Up"
+        tools:layout="@layout/fragment_sign_up" />
+
+</navigation>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Основные цвета -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Дополнительные -->
+    <color name="gray_200">#FFEEEEEE</color>
+    <color name="gray_500">#FF9E9E9E</color>
+    <color name="gray_700">#FF616161</color>
+
+    <!-- Состояния -->
+    <color name="error">#FFB00020</color>
+    <color name="success">#FF00C853</color>
+    <color name="warning">#FFFFD600</color>
+
+    <!-- События -->
+    <color name="event_online">#FF4CAF50</color>
+    <color name="event_offline">#FF2196F3</color>
+
+
+
+    <color name="colorPrimary">#F3EDF7</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
+    <color name="divider_color">#ccc</color>
+
+
+    <color name="bottom_nav_background">#F3EDF7</color> <!-- Фон -->
+    <!-- Active icon and text color -->
+    <color name="bottom_nav_icon_background_active">#E8DEF8</color>
+    <color name="bottom_nav_icon_active">#49454F</color>
+    <color name="bottom_nav_text_active">#1D1B20</color>
+
+    <!-- Inactive icon and text color -->
+    <color name="bottom_nav_icon_inactive">#1D1B20</color>
+    <color name="bottom_nav_text_inactive">#49454F</color>
+
+
+    <!-- Цвета для AppBar -->
+    <color name="appbar_background">#FEF7FF</color>
+    <color name="appbar_title">#1D1B20</color>
+    <color name="menu_icon">#1D1B20</color>
+
+
+    <color name="active_color">#6750A4</color> <!-- Основной цвет интерфейса (например, акцентный цвет) -->
+    <color name="fill_color">#E6E0E9</color> <!-- Цвет фона полей ввода -->
+    <color name="input_text_color">#1D1B20</color> <!-- Цвет текста, вводимого в поля -->
+
+
+</resources>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="topappbar_text_size">22dp</dimen>
+    <dimen name="head_and_title_text_size">16dp</dimen>
+    <dimen name="common_text_size">14dp</dimen>
+    <dimen name="bottomnav_text_size">12dp</dimen>
+
+    <dimen name="common_spacing">16dp</dimen>
+    <dimen name="sign_spacing">32dp</dimen>
+    <dimen name="spacing_4dp">4dp</dimen>
+    <dimen name="spacing_8dp">8dp</dimen>
+    <dimen name="topappbar_size">64dp</dimen>
+    <dimen name="spacing_12dp">12dp</dimen>
+    <dimen name="posts_avatar_size">40dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="avatar">160dp</dimen>
+    <dimen name="checkbox_padding_start">8dp</dimen>
+    <dimen name="icon_button_padding">12dp</dimen>
+    <dimen name="icon_button_min_size">48dp</dimen>
+    <dimen name="sing_in_text_size">24sp</dimen>
+    <dimen name="text_size_14sp">14sp</dimen>
+    <dimen name="text_size_16sp">16sp</dimen>
+    <dimen name="button_corner_radius">100dp</dimen>
+    <dimen name="card_corner_radius">12dp</dimen>
+
+    <!-- Размеры для AppBar -->
+    <dimen name="appbar_height">64dp</dimen>
+    <dimen name="appbar_padding_start">16dp</dimen>
+    <dimen name="appbar_padding_end">4dp</dimen>
+    <dimen name="appbar_padding_top">8dp</dimen>
+    <dimen name="appbar_padding_bottom">8dp</dimen>
+
+    <!-- Размеры текста -->
+    <dimen name="appbar_title_text">22sp</dimen>
+    <dimen name="appbar_title_line_height">28sp</dimen>
+
+    <!-- Размеры кнопки меню -->
+    <dimen name="menu_button">48dp</dimen>
+    <dimen name="menu_icon">24dp</dimen>
+
+    <!-- Общие отступы -->
+    <dimen name="spacing_32dp">32dp</dimen> <!-- Отступ по горизонтали у контейнера -->
+
+    <!-- Размеры текста -->
+    <dimen name="text_size">16sp</dimen> <!-- Размер текста в полях ввода -->
+    <dimen name="button_text_size">14sp</dimen> <!-- Размер текста в кнопках -->
+    <dimen name="button_line_height">20sp</dimen> <!-- Высота строки текста в кнопках -->
+
+    <!-- Отступы внутри кнопок -->
+    <dimen name="button_padding_horizontal">24dp</dimen> <!-- Горизонтальные отступы внутри кнопки Login -->
+    <dimen name="button_padding_vertical">10dp</dimen> <!-- Вертикальные отступы внутри кнопок -->
+
+    <!-- Отступы внутри кнопки-ссылки -->
+    <dimen name="link_button_padding_horizontal">12dp</dimen> <!-- Горизонтальные отступы внутри кнопки-ссылки -->
+
+</resources>

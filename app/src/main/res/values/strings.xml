@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NeWork</string>
+
+    <!-- Навигация -->
+    <string name="posts">Posts</string>
+    <string name="events">Events</string>
+    <string name="users">Users</string>
+
+    <!-- Сообщения -->
+    <string name="no_posts">No posts yet</string>
+    <string name="no_events">No events yet</string>
+    <string name="no_users">No users yet</string>
+    <string name="create_new_post">Create new post</string>
+    <string name="create_new_event">Create new event</string>
+
+    <!-- Аватары -->
+    <string name="author_avatar">Author avatar</string>
+    <string name="user_avatar">User avatar</string>
+
+    <!-- Общие -->
+    <string name="link">Link</string>
+    <string name="loading">Loading…</string>
+    <string name="error">Error</string>
+    <string name="retry">Retry</string>
+    <string name="speakers">Спикеры</string>
+
+    <!-- Авторизация -->
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="name">Name</string>
+    <string name="repeat_password">Repeat Password</string>
+
+    <!-- Действия -->
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="like">Like</string>
+    <string name="share">Share</string>
+    <string name="menu">Menu</string>
+    <string name="attachment">Attachment</string>
+    <string name="no_posts_subtitle">Be the first to create a post</string>
+    <string name="no_events_subtitle">Be the first to create an event</string>
+    <string name="error_loading_posts">Error loading posts</string>
+    <string name="tap_to_retry">Tap to retry</string>
+    <string name="unlike">Unlike</string>
+    <string name="participate">Участвовать</string>
+
+
+
+    <string name="description_post_author_avatar">Аватар автора поста</string>
+    <string name="menu_edit">Изменить</string>
+    <string name="menu_remove">Удалить</string>
+    <string name="add_post">Добавить пост</string>
+    <string name="empty_posts">Постов нет.\nЕсли создадите новый пост, то он появится здесь</string>
+    <string name="error_loading">Не удалось загрузить данные</string>
+    <string name="description_take_photo">Сделать фото</string>
+    <string name="description_photo">Фото</string>
+    <string name="remove">Удалить</string>
+    <string name="logout">Выйти</string>
+    <string name="like_post_dialog">Покажите ваши эмоции.</string>
+    <string name="like_post_dialog_header">Войдите и отправляйте реакции!</string>
+    <string name="student">Студент</string>
+    <string name="don_t_have_an_account_register">Нет аккаунта? Зарегистрируйся</string>
+    <string name="cannot_be_empty">" не может быть пустым"</string>
+    <string name="password_and_password_confirmation_must_match">Пароль и подтверждение пароля должны совпадать</string>
+    <string name="profile">Профиль</string>
+    <string name="play">Воспроизвести</string>
+    <string name="likers">Нравится</string>
+    <string name="post">Пост</string>
+    <string name="wall">Стена</string>
+    <string name="jobs">Работы</string>
+    <string name="empty_users">Пользователей нет</string>
+    <string name="online">Онлайн</string>
+    <string name="offline">Офлайн</string>
+    <string name="attach_video_audio">Добавить видео или аудио файл</string>
+    <string name="select_location">Выберите местоположение</string>
+    <string name="select_date_event_type">Выберите дату и тип события</string>
+    <string name="date">Дата</string>
+    <string name="attach_image">Добавить изображение</string>
+    <string name="register">Зарегистрироваться</string>
+    <string name="select_users">Выберите пользователей</string>
+    <string name="new_post">Новый пост</string>
+    <string name="set_placemark">Установить метку</string>
+    <string name="replace_attachment">Заменить вложение?</string>
+    <string name="you_have_already_added_an_atatchment">Вы уже добавили вложение. Если вы продолжите, текушее вложение будет удалено. Продолжить?</string>
+    <string name="continue_action">Продолжить действие</string>
+    <string name="content_can_not_be_empty">Контент не может быть пустым</string>
+    <string name="mentioned">Упоминаются</string>
+    <string name="looking_for_a_job">В поиске работы</string>
+    <string name="you">Вы</string>
+    <string name="choose_users">Выберите пользователей</string>
+    <string name="participants">Участники</string>
+    <string name="event">Событие</string>
+    <string name="new_event">Новое событие</string>
+    <string name="avatar">Аватар</string>
+    <string name="CT">НВ</string>
+</resources>
