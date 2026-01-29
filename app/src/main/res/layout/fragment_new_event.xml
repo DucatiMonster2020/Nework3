@@ -1,14 +1,224 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.NewEventFragment">
+    android:padding="16dp">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="New Event (TODO)" />
+        android:orientation="vertical">
 
-</FrameLayout>
+        <!-- Поле ввода текста -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/event_content">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/content"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:gravity="top"
+                android:inputType="textMultiLine"
+                android:minLines="5" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Radio buttons для типа события -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/event_type"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:id="@+id/eventTypeGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/onlineRadio"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="true"
+                android:text="@string/online" />
+
+            <RadioButton
+                android:id="@+id/offlineRadio"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/offline" />
+
+        </RadioGroup>
+
+        <!-- Кнопка выбора локации (видна только для offline) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/locationButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/select_location"
+            style="?attr/materialButtonOutlinedStyle"
+            android:drawableStart="@drawable/ic_location_pin"
+            android:drawablePadding="8dp"
+            android:visibility="gone" />
+
+        <!-- Кнопка выбора даты проведения -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/dateButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/select_event_date"
+            style="?attr/materialButtonOutlinedStyle"
+            android:drawableStart="@drawable/ic_date"
+            android:drawablePadding="8dp" />
+
+        <!-- Кнопки выбора изображения -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/select_image"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/photoButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/photo"
+                style="?attr/materialButtonOutlinedStyle"
+                android:drawableStart="@drawable/ic_camera"
+                android:drawablePadding="4dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/galleryButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="@string/gallery"
+                style="?attr/materialButtonOutlinedStyle"
+                android:drawableStart="@drawable/ic_image"
+                android:drawablePadding="4dp" />
+
+        </LinearLayout>
+
+        <!-- Кнопки выбора вложения -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/select_attachment"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/audioButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/audio"
+                style="?attr/materialButtonOutlinedStyle"
+                android:drawableStart="@drawable/ic_audio"
+                android:drawablePadding="4dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/videoButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="@string/video"
+                style="?attr/materialButtonOutlinedStyle"
+                android:drawableStart="@drawable/ic_video"
+                android:drawablePadding="4dp" />
+
+        </LinearLayout>
+
+        <!-- Информация о вложении -->
+        <TextView
+            android:id="@+id/attachmentType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/no_attachment" />
+
+        <!-- Кнопка удаления вложения -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/removeAttachmentButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/remove_attachment"
+            android:visibility="gone"
+            style="?attr/materialButtonOutlinedStyle" />
+
+        <!-- Кнопка выбора спикеров -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/speakersButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/select_speakers"
+            style="?attr/materialButtonOutlinedStyle"
+            android:drawableStart="@drawable/ic_speakers"
+            android:drawablePadding="8dp" />
+
+        <!-- Кнопка добавления ссылки -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/linkButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/add_link"
+            style="?attr/materialButtonOutlinedStyle"
+            android:drawableStart="@drawable/ic_link_24"
+            android:drawablePadding="8dp" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/linkInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="@string/link"
+            android:visibility="gone">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textUri" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Прогресс-бар -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="32dp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

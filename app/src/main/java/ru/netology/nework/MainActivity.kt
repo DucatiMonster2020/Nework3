@@ -3,32 +3,43 @@ package ru.netology.nework
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import ru.netology.nework.auth.AuthStateManager
+import ru.netology.nework.auth.AppAuth
 import ru.netology.nework.databinding.ActivityMainBinding
+import ru.netology.nework.viewmodel.AuthViewModel
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var appAuth: AppAuth
+
+    private val viewModel: AuthViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setSupportActionBar(binding.toolbar)
 
-        // Настройка навигации
+        setSupportActionBar(binding.toolbar)
         setupNavigation()
+        setupObservers()
     }
+
     private fun setupNavigation() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
 
-        // Настройка BottomNavigationView
+        // Настройка BottomNavigationView (ТЗ: нижнее меню с тремя кнопками)
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNavigationView.setupWithNavController(navController)
 
@@ -42,9 +53,28 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupObservers() {
+        // Наблюдаем за состоянием авторизации
+        viewModel.authState.observe(this) { authState ->
+            invalidateOptionsMenu() // Перерисовываем меню при изменении авторизации
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        // Формируем меню в зависимости от состояния аутентификации (ТЗ)
+        val isAuthorized = appAuth.authState.value?.id != 0L
+
+        menu.findItem(R.id.sign_in).isVisible = !isAuthorized
+        menu.findItem(R.id.sign_up).isVisible = !isAuthorized
+        menu.findItem(R.id.profile).isVisible = isAuthorized
+        menu.findItem(R.id.sign_out).isVisible = isAuthorized
+
+        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -54,60 +84,69 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.sign_in -> {
-                // TODO: переход к экрану входа
                 navigateToSignIn()
                 true
             }
             R.id.sign_up -> {
-                // TODO: переход к экрану регистрации
                 navigateToSignUp()
                 true
             }
             R.id.profile -> {
-                // TODO: переход к профилю
                 navigateToProfile()
                 true
             }
             R.id.sign_out -> {
-                // TODO: выход из аккаунта
                 signOut()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
-    private fun updateMenu() {
-        val isAuthorized = AuthStateManager.authState.value is AuthStateManager.AuthState.Authorized
-
-        invalidateOptionsMenu() // Перерисовываем меню
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        val isAuthorized = AuthStateManager.authState.value is AuthStateManager.AuthState.Authorized
-
-        // Показываем/скрываем группы меню в зависимости от авторизации
-        menu.findItem(R.id.sign_in)?.isVisible = !isAuthorized
-        menu.findItem(R.id.sign_up)?.isVisible = !isAuthorized
-        menu.findItem(R.id.profile)?.isVisible = isAuthorized
-        menu.findItem(R.id.sign_out)?.isVisible = isAuthorized
-
-        return super.onPrepareOptionsMenu(menu)
-    }
-
     private fun navigateToSignIn() {
-        // TODO: навигация к экрану входа
+        // Простая навигация к экрану входа
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        // Если мы не на экране входа - переходим
+        val currentDestination = navController.currentDestination?.id
+        if (currentDestination != R.id.signInFragment) {
+            navController.navigate(R.id.signInFragment)
+        }
     }
 
     private fun navigateToSignUp() {
-        // TODO: навигация к экрану регистрации
+        // Простая навигация к экрану регистрации
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        val currentDestination = navController.currentDestination?.id
+        if (currentDestination != R.id.signUpFragment) {
+            navController.navigate(R.id.signUpFragment)
+        }
     }
 
     private fun navigateToProfile() {
-        // TODO: навигация к профилю
+        val userId = appAuth.authState.value?.id ?: 0L
+        if (userId != 0L) {
+            val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+            val navController = navHostFragment.navController
+
+            Snackbar.make(
+                binding.root,
+                "Переход к своему профилю",
+                Snackbar.LENGTH_SHORT
+            ).show()
+        }
     }
 
     private fun signOut() {
-        // TODO: выход из аккаунта
+        // Выход из аккаунта
+        appAuth.setAuth(null)
+        Snackbar.make(
+            binding.root,
+            "Вы вышли из аккаунта",
+            Snackbar.LENGTH_SHORT
+        ).show()
     }
 
     override fun onSupportNavigateUp(): Boolean {

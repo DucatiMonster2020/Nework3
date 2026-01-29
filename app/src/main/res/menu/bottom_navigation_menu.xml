@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Три кнопки как требует ТЗ -->
     <item
         android:id="@+id/postsFragment"
-        android:icon="@drawable/ic_baseline_list_24"
+        android:icon="@drawable/ic_posts"
         android:title="@string/posts" />
+
     <item
         android:id="@+id/eventsFragment"
-        android:icon="@drawable/ic_baseline_event_24"
+        android:icon="@drawable/ic_events"
         android:title="@string/events" />
+
     <item
         android:id="@+id/usersFragment"
-        android:icon="@drawable/ic_baseline_people_24"
+        android:icon="@drawable/ic_users_24"
         android:title="@string/users" />
+
 </menu>

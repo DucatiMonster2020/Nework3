@@ -2,32 +2,26 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- Меню для неавторизованных пользователей -->
-    <group android:id="@+id/group_unauthorized">
-        <item
-            android:id="@+id/sign_in"
-            android:title="@string/sign_in"
-            android:icon="@drawable/ic_login_24"
-            app:showAsAction="ifRoom" />
-        <item
-            android:id="@+id/sign_up"
-            android:title="@string/sign_up"
-            android:icon="@drawable/ic_person_add_24"
-            app:showAsAction="ifRoom" />
-    </group>
+    <!-- Для неавторизованных пользователей -->
+    <item
+        android:id="@+id/sign_in"
+        android:title="@string/sign_in"
+        app:showAsAction="never" />
 
-    <!-- Меню для авторизованных пользователей -->
-    <group android:id="@+id/group_authorized">
-        <item
-            android:id="@+id/profile"
-            android:title="@string/profile"
-            android:icon="@drawable/author_avatar"
-            app:showAsAction="ifRoom" />
-        <item
-            android:id="@+id/sign_out"
-            android:title="@string/sign_out"
-            android:icon="@drawable/ic_logout_24"
-            app:showAsAction="ifRoom" />
-    </group>
+    <item
+        android:id="@+id/sign_up"
+        android:title="@string/sign_up"
+        app:showAsAction="never" />
+
+    <!-- Для авторизованных пользователей -->
+    <item
+        android:id="@+id/profile"
+        android:title="@string/profile"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/sign_out"
+        android:title="@string/sign_out"
+        app:showAsAction="never" />
 
 </menu>

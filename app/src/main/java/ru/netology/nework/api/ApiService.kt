@@ -131,6 +131,9 @@ interface ApiService {
     @GET("api/my/jobs")
     suspend fun getMyJobs(): Response<List<Job>>
 
+    @GET("api/{userId}/jobs")
+    suspend fun getUserJobs(@Path("userId") userId: Long): Response<List<Job>>
+
     @POST("api/my/jobs")
     suspend fun saveJob(@Body job: Job): Response<Job>
 
@@ -148,11 +151,3 @@ interface ApiService {
     @GET("api/{authorId}/wall")
     suspend fun getUserWall(@Path("authorId") authorId: Long): Response<List<Post>>
 }
-
-data class Media(
-    val url: String
-)
-
-data class PushToken(
-    val token: String
-)

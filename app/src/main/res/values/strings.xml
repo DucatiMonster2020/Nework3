@@ -6,6 +6,9 @@
     <string name="posts">Posts</string>
     <string name="events">Events</string>
     <string name="users">Users</string>
+    <string name="profile">Профиль</string>
+
+
 
     <!-- Сообщения -->
     <string name="no_posts">No posts yet</string>
@@ -23,7 +26,6 @@
     <string name="loading">Loading…</string>
     <string name="error">Error</string>
     <string name="retry">Retry</string>
-    <string name="speakers">Спикеры</string>
 
     <!-- Авторизация -->
     <string name="sign_in">Sign In</string>
@@ -33,6 +35,9 @@
     <string name="password">Password</string>
     <string name="name">Name</string>
     <string name="repeat_password">Repeat Password</string>
+
+    <!-- Регистрация -->
+    <string name="select_photo">Выбрать фото</string>
 
     <!-- Действия -->
     <string name="save">Save</string>
@@ -50,12 +55,100 @@
     <string name="unlike">Unlike</string>
     <string name="participate">Участвовать</string>
 
+    <string name="wall_tab">Стена</string>
+    <string name="jobs_tab">Работы</string>
+    <string name="loading_user">Загрузка профиля...</string>
+
+
+    <string name="user_jobs">Работы</string>
+    <string name="one_job">1 работа</string>
+    <plurals name="jobs_count">
+        <item quantity="one">%d работа</item>
+        <item quantity="few">%d работы</item>
+        <item quantity="many">%d работ</item>
+        <item quantity="other">%d работ</item>
+    </plurals>
+
+    <string name="position">Должность</string>
+    <string name="period">Период</string>
+    <string name="present">настоящее время</string>
+    <string name="website">Сайт</string>
+
+    <string name="no_jobs_found">Работы не найдены</string>
+    <string name="no_jobs_description">У пользователя пока нет информации о местах работы</string>
+    <string name="add_job">Добавить работу</string>
+    <string name="edit_job">Редактировать</string>
+    <string name="delete_job">Удалить</string>
+    <string name="delete_job_confirmation">Удалить информацию об этой работе?</string>
+
+    <string name="company_icon">Иконка компании</string>
+    <string name="job_menu">Меню работы</string>
+    <string name="cannot_open_link">Не удалось открыть ссылку</string>
+
+    <!-- Стена пользователя -->
+    <string name="no_posts_on_wall">На стене пока нет постов</string>
+    <string name="no_posts_description">Пользователь еще ничего не опубликовал</string>
+    <string name="header_background">Фоновое изображение</string>
+    <string name="add_post">Добавить пост</string>
+    <!-- Стена пользователя -->
+    <string name="looking_for_job">В поиске работы</string>
+    <string name="delete_post">Удалить пост</string>
+    <string name="delete_post_confirmation">Удалить этот пост?</string>
+    <string name="edit_post">Редактировать</string>
+    <string name="copy_text">Скопировать текст</string>
+    <string name="text_copied">Текст скопирован</string>
+    <string name="cannot_open_attachment">Не удалось открыть вложение</string>
+    <string name="post_menu">Меню поста</string>
+    <string name="mentioned_users">Упомянутые пользователи</string>
+    <string name="map">Карта</string>
+
+    <!-- Общие ошибки -->
+    <string name="unknown_error">Произошла неизвестная ошибка</string>
+
+    <!-- Работы пользователя -->
+    <string name="no_jobs">Нет работ</string>
+    <string name="user_wall">Стена пользователя</string>
+    <string name="open_website">Открыть сайт</string>
+
+    <!-- Создание поста -->
+    <string name="post_content">Текст поста</string>
+    <string name="select_location">Выбрать локацию</string>
+    <string name="select_mentioned_users">Выбрать упомянутых пользователей</string>
+    <string name="select_image">Выберите изображение</string>
+    <string name="photo">Фото</string>
+    <string name="gallery">Галерея</string>
+    <string name="select_attachment">Выберите вложение</string>
+    <string name="audio">Аудио</string>
+    <string name="video">Видео</string>
+    <string name="no_attachment">Вложение не выбрано</string>
+    <string name="remove_attachment">Удалить вложение</string>
+    <string name="add_link">Добавить ссылку</string>
+    <string name="post_options">Опции поста</string>
+    <string name="login_required">Требуется вход</string>
+    <string name="please_login_to_create_post">Войдите в аккаунт, чтобы создать пост</string>
+
+    <!-- Создание события -->
+    <string name="event_content">Текст события</string>
+    <string name="event_type">Тип события</string>
+    <string name="online">Online</string>
+    <string name="offline">Offline</string>
+    <string name="select_event_date">Выбрать дату проведения</string>
+    <string name="select_speakers">Выбрать спикеров</string>
+
+    <string name="event_menu">Меню события</string>
+    <string name="speakers">Спикеры</string>
+    <string name="participants">Участники</string>
+
+
+    <!-- Мой профиль -->
+    <string name="my_wall">Моя стена</string>
+    <string name="my_jobs">Мои работы</string>
+
 
 
     <string name="description_post_author_avatar">Аватар автора поста</string>
     <string name="menu_edit">Изменить</string>
     <string name="menu_remove">Удалить</string>
-    <string name="add_post">Добавить пост</string>
     <string name="empty_posts">Постов нет.\nЕсли создадите новый пост, то он появится здесь</string>
     <string name="error_loading">Не удалось загрузить данные</string>
     <string name="description_take_photo">Сделать фото</string>
@@ -68,17 +161,13 @@
     <string name="don_t_have_an_account_register">Нет аккаунта? Зарегистрируйся</string>
     <string name="cannot_be_empty">" не может быть пустым"</string>
     <string name="password_and_password_confirmation_must_match">Пароль и подтверждение пароля должны совпадать</string>
-    <string name="profile">Профиль</string>
     <string name="play">Воспроизвести</string>
     <string name="likers">Нравится</string>
     <string name="post">Пост</string>
     <string name="wall">Стена</string>
     <string name="jobs">Работы</string>
     <string name="empty_users">Пользователей нет</string>
-    <string name="online">Онлайн</string>
-    <string name="offline">Офлайн</string>
     <string name="attach_video_audio">Добавить видео или аудио файл</string>
-    <string name="select_location">Выберите местоположение</string>
     <string name="select_date_event_type">Выберите дату и тип события</string>
     <string name="date">Дата</string>
     <string name="attach_image">Добавить изображение</string>
@@ -94,7 +183,6 @@
     <string name="looking_for_a_job">В поиске работы</string>
     <string name="you">Вы</string>
     <string name="choose_users">Выберите пользователей</string>
-    <string name="participants">Участники</string>
     <string name="event">Событие</string>
     <string name="new_event">Новое событие</string>
     <string name="avatar">Аватар</string>

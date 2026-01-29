@@ -7,9 +7,13 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import ru.netology.nework.R
 import ru.netology.nework.adapter.UsersAdapter
 import ru.netology.nework.databinding.FragmentUsersBinding
 import ru.netology.nework.viewmodel.UsersViewModel
@@ -24,8 +28,9 @@ class UsersFragment : Fragment() {
     private val adapter by lazy {
         UsersAdapter(
             onItemClickListener = { user ->
-                showSnackbar("Clicked user: ${user.name}")
                 // TODO: переход к профилю пользователя
+                // Пока просто показываем Snackbar
+                Snackbar.make(binding.root, "Пользователь: ${user.name}", Snackbar.LENGTH_SHORT).show()
             }
         )
     }
@@ -45,6 +50,7 @@ class UsersFragment : Fragment() {
         setupRecyclerView()
         setupObservers()
         setupListeners()
+        loadUsers()
     }
 
     private fun setupRecyclerView() {
@@ -56,49 +62,48 @@ class UsersFragment : Fragment() {
         viewModel.users.observe(viewLifecycleOwner) { users ->
             adapter.submitList(users)
 
-            // Показываем/скрываем сообщение о пустом списке
-            binding.emptyContainer.isVisible = users.isEmpty()
-            binding.emptyTitle.isVisible = users.isEmpty()
-            binding.emptySubtitle.isVisible = users.isEmpty()
-            binding.retryButton.isVisible = users.isEmpty()
+            // Простое сообщение если нет пользователей
+            if (users.isEmpty()) {
+                binding.usersList.isVisible = false
+                // Можно показать простой TextView
+            } else {
+                binding.usersList.isVisible = true
+            }
         }
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
-            // Состояние загрузки
             binding.progressBar.isVisible = state.loading
             binding.swipeRefresh.isRefreshing = state.refreshing
 
-            // Ошибка
-            if (state.error) {
+            if (state.error && state.errorMessage != null) {
                 showError(state.errorMessage)
             }
-            binding.usersList.isEnabled = !state.loading
         }
     }
 
     private fun setupListeners() {
         // Обновление по свайпу
         binding.swipeRefresh.setOnRefreshListener {
-            viewModel.refreshUsers()
+            refreshUsers()
         }
+    }
 
-        // Кнопка Retry
-        binding.retryButton.setOnClickListener {
+    private fun loadUsers() {
+        lifecycleScope.launch {
             viewModel.loadUsers()
         }
     }
 
-    private fun showError(message: String?) {
-        val errorMsg = message ?: "An error occurred"
-        Snackbar.make(binding.root, errorMsg, Snackbar.LENGTH_LONG)
-            .setAction("Retry") {
-                viewModel.loadUsers()
-            }
-            .show()
+    private fun refreshUsers() {
+        lifecycleScope.launch {
+            viewModel.refreshUsers()
+        }
     }
 
-    private fun showSnackbar(message: String) {
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
+    private fun showError(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setAction(R.string.retry) { loadUsers() }
+            .show()
     }
 
     override fun onDestroyView() {
