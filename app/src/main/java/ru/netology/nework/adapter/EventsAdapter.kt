@@ -60,10 +60,10 @@ class EventsAdapter(
                     Glide.with(authorAvatar)
                         .load(event.authorAvatar)
                         .circleCrop()
-                        .placeholder(android.R.drawable.ic_menu_gallery)
+                        .placeholder(R.drawable.author_avatar)
                         .into(authorAvatar)
                 } else {
-                    authorAvatar.setImageResource(android.R.drawable.ic_menu_gallery)
+                    authorAvatar.setImageResource(R.drawable.author_avatar)
                 }
 
                 // Основная информация
@@ -90,8 +90,8 @@ class EventsAdapter(
                 // Цвет в зависимости от типа
                 eventType.setBackgroundResource(
                     when (event.type) {
-                        EventType.ONLINE -> android.R.color.holo_green_light
-                        EventType.OFFLINE -> android.R.color.holo_blue_light
+                        EventType.ONLINE -> R.color.event_online
+                        EventType.OFFLINE -> R.color.event_offline
                     }
                 )
 
@@ -106,7 +106,7 @@ class EventsAdapter(
                 participantsCount.text = event.participantsIds.size.toString()
                 participateButton.isChecked = event.participatedByMe
                 val participateIcon = if (event.participatedByMe) {
-                    R.drawable.ic_check_circle
+                    R.drawable.ic_check
                 } else {
                     R.drawable.ic_check_box_outline
                 }
@@ -123,15 +123,15 @@ class EventsAdapter(
                     event.attachment?.let { attachment ->
                         when (attachment.type) {
                             AttachmentType.IMAGE -> {
-                                attachmentIcon.setImageResource(android.R.drawable.ic_menu_gallery)
+                                attachmentIcon.setImageResource(R.drawable.ic_image)
                                 attachmentType.text = "Фото"
                             }
                             AttachmentType.VIDEO -> {
-                                attachmentIcon.setImageResource(android.R.drawable.ic_media_play)
+                                attachmentIcon.setImageResource(R.drawable.ic_video)
                                 attachmentType.text = "Видео"
                             }
                             AttachmentType.AUDIO -> {
-                                attachmentIcon.setImageResource(android.R.drawable.ic_btn_speak_now)
+                                attachmentIcon.setImageResource(R.drawable.ic_audio)
                                 attachmentType.text = "Аудио"
                             }
                         }

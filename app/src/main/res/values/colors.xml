@@ -1,56 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Основные цвета -->
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
+    <!-- Базовые -->
     <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
 
-    <!-- Дополнительные -->
-    <color name="gray_200">#FFEEEEEE</color>
-    <color name="gray_500">#FF9E9E9E</color>
-    <color name="gray_700">#FF616161</color>
+    <!-- Основные цвета интерфейса -->
+    <color name="light_pink">#FFF3EDF7</color>  <!-- Светло-розовый для шапки и карточек -->
+    <color name="lilac">#FF6750A4</color>       <!-- Сиреневый для кнопок и акцентов -->
 
-    <!-- Состояния -->
-    <color name="error">#FFB00020</color>
-    <color name="success">#FF00C853</color>
-    <color name="warning">#FFFFD600</color>
+    <color name="primary_30">#4F378B</color>
+
+
+    <color name="light_pink_100">#E8DEF8</color>   <!-- Немного темнее -->
+
+    <color name="light_pink_200">#D0BCFF</color>   <!-- С сиреневым оттенком -->
+    <color name="light_pink_300">#B69DF8</color>   <!-- Средний -->
+
+    <color name="secondary_80">#CCC2DC</color>
+
+
+    <!-- Neutral Colors (оттенки серого/черного для текста) -->
+    <color name="neutral_0">#000000</color>
+
+    <color name="error_40">#B3261E</color>  <!-- Основной цвет ошибки -->
 
     <!-- События -->
-    <color name="event_online">#FF4CAF50</color>
-    <color name="event_offline">#FF2196F3</color>
+    <color name="event_online">#4CAF50</color>
+    <color name="event_offline">#2196F3</color>
 
+    <!-- Для AppBar -->
+    <color name="appbar_background">@color/light_pink</color>
+    <color name="appbar_title">@color/black</color>
+    <color name="menu_icon">@color/black</color>
 
+    <!-- Для BottomNavigation -->
+    <color name="bottom_nav_background">@color/light_pink</color>
+    <color name="bottom_nav_icon_background_active">@color/light_pink_300</color>
+    <color name="bottom_nav_icon_active">@color/lilac</color>
+    <color name="bottom_nav_text_active">@color/black</color>
+    <color name="bottom_nav_icon_inactive">@color/black</color>
+    <color name="bottom_nav_text_inactive">@color/black</color>
 
-    <color name="colorPrimary">#F3EDF7</color>
-    <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
-    <color name="divider_color">#ccc</color>
+    <!-- Для карточек -->
+    <color name="card_background">@color/light_pink</color>
+    <color name="card_text">@color/black</color>
+    <color name="card_subtext">@color/black</color>
 
+    <!-- Для кнопок -->
+    <color name="button_primary_background">@color/lilac</color>
+    <color name="button_primary_text">@color/white</color>
+    <color name="button_secondary_background">@color/light_pink</color>
+    <color name="button_secondary_text">@color/lilac</color>
+    <color name="button_disabled_background">@color/black</color>
+    <color name="button_disabled_text">@color/black</color>
 
-    <color name="bottom_nav_background">#F3EDF7</color> <!-- Фон -->
-    <!-- Active icon and text color -->
-    <color name="bottom_nav_icon_background_active">#E8DEF8</color>
-    <color name="bottom_nav_icon_active">#49454F</color>
-    <color name="bottom_nav_text_active">#1D1B20</color>
+    <!-- Для полей ввода -->
+    <color name="input_background">@color/white</color>
+    <color name="input_text">@color/lilac</color>
+    <color name="input_hint">@color/light_pink_300</color>
+    <color name="input_border">@color/lilac</color>
+    <color name="input_border_focused">@color/lilac</color>
 
-    <!-- Inactive icon and text color -->
-    <color name="bottom_nav_icon_inactive">#1D1B20</color>
-    <color name="bottom_nav_text_inactive">#49454F</color>
+    <!-- Разделители -->
+    <color name="divider_color">@color/light_pink_300</color>
+    <color name="divider_color_light">@color/lilac</color>
 
+    <!-- Для списков -->
+    <color name="list_background">@color/white</color>
+    <color name="list_item_background">@color/light_pink</color>
+    <color name="list_item_selected">@color/lilac</color>
 
-    <!-- Цвета для AppBar -->
-    <color name="appbar_background">#FEF7FF</color>
-    <color name="appbar_title">#1D1B20</color>
-    <color name="menu_icon">#1D1B20</color>
+    <!-- Для состояний -->
+    <color name="pressed_state">#1F6750A4</color>  <!-- 12% прозрачности lilac -->
+    <color name="hover_state">#146750A4</color>    <!-- 8% прозрачности lilac -->
+    <color name="focus_state">#246750A4</color>    <!-- 14% прозрачности lilac -->
 
+    <!-- Устаревшие имена для совместимости -->
+    <color name="colorPrimary">@color/light_pink</color>
+    <color name="colorPrimaryDark">@color/primary_30</color>
+    <color name="colorAccent">@color/lilac</color>
+    <color name="colorSurface">@color/white</color>
+    <color name="colorOnSurface">@color/black</color>
+    <color name="colorOnPrimary">@color/white</color>
+    <color name="colorOnSecondary">@color/white</color>
+    <color name="colorBackground">@color/white</color>
+    <color name="colorOnBackground">@color/black</color>
 
-    <color name="active_color">#6750A4</color> <!-- Основной цвет интерфейса (например, акцентный цвет) -->
-    <color name="fill_color">#E6E0E9</color> <!-- Цвет фона полей ввода -->
-    <color name="input_text_color">#1D1B20</color> <!-- Цвет текста, вводимого в поля -->
-
-
+    <!-- Семантические имена из вашего запроса -->
+    <color name="active_color">@color/lilac</color>
+    <color name="fill_color">@color/white</color>
+    <color name="input_text_color">@color/black</color>
 </resources>
