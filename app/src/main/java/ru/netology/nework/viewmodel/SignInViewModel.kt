@@ -44,7 +44,10 @@ class SignInViewModel @Inject constructor(
                         _error.value = "Ошибка авторизации"
                     }
                 } else {
-                    _error.value = "HTTP ${response.code()}"
+                    when (response.code()) {
+                        400 -> _error.value = "Неправильный логин или пароль"
+                        else -> _error.value = "Ошибка: ${response.code()}"
+                    }
                 }
             } catch (e: Exception) {
                 _error.value = AppError.fromThrowable(e).message

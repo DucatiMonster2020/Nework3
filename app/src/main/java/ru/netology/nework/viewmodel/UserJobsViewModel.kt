@@ -29,14 +29,10 @@ class UserJobsViewModel @Inject constructor(
             try {
                 _loading.value = true
                 _error.value = null
-
-                // Пока используем getMyJobs() для демонстрации
-                // TODO: Нужно добавить endpoint для получения работ пользователя
-                val response = apiService.getMyJobs()
+                val response = apiService.getUserJobs(userId)
 
                 if (response.isSuccessful) {
                     val allJobs = response.body() ?: emptyList()
-                    // Показываем все работы (в реальном приложении фильтровать по userId)
                     _jobs.value = allJobs
                 } else {
                     _error.value = AppError.fromThrowable(
@@ -60,7 +56,6 @@ class UserJobsViewModel @Inject constructor(
             try {
                 val response = apiService.deleteJob(jobId)
                 if (response.isSuccessful) {
-                    // Удаляем работу из списка
                     _jobs.value = _jobs.value?.filter { it.id != jobId }
                 } else {
                     _error.value = "Не удалось удалить работу"

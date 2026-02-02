@@ -38,12 +38,8 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
-
-        // Настройка BottomNavigationView (ТЗ: нижнее меню с тремя кнопками)
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNavigationView.setupWithNavController(navController)
-
-        // Настройка кнопки "Назад" в Toolbar
         navController.addOnDestinationChangedListener { _, destination, _ ->
             supportActionBar?.setDisplayHomeAsUpEnabled(
                 destination.id != R.id.postsFragment &&
@@ -54,9 +50,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        // Наблюдаем за состоянием авторизации
         viewModel.authState.observe(this) { authState ->
-            invalidateOptionsMenu() // Перерисовываем меню при изменении авторизации
+            invalidateOptionsMenu()
         }
     }
 
@@ -66,7 +61,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        // Формируем меню в зависимости от состояния аутентификации (ТЗ)
         val isAuthorized = appAuth.authState.value?.id != 0L
 
         menu.findItem(R.id.sign_in).isVisible = !isAuthorized
@@ -103,11 +97,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun navigateToSignIn() {
-        // Простая навигация к экрану входа
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
-
-        // Если мы не на экране входа - переходим
         val currentDestination = navController.currentDestination?.id
         if (currentDestination != R.id.signInFragment) {
             navController.navigate(R.id.signInFragment)
@@ -115,7 +106,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun navigateToSignUp() {
-        // Простая навигация к экрану регистрации
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
 
@@ -130,17 +120,11 @@ class MainActivity : AppCompatActivity() {
         if (userId != 0L) {
             val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
             val navController = navHostFragment.navController
-
-            Snackbar.make(
-                binding.root,
-                "Переход к своему профилю",
-                Snackbar.LENGTH_SHORT
-            ).show()
+            navController.navigate(R.id.action_global_myProfileFragment)
         }
     }
 
     private fun signOut() {
-        // Выход из аккаунта
         appAuth.setAuth(null)
         Snackbar.make(
             binding.root,

@@ -5,65 +5,168 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/postsFragment">
 
-    <!-- Основные фрагменты -->
     <fragment
         android:id="@+id/postsFragment"
         android:name="ru.netology.nework.ui.PostsFragment"
         android:label="@string/posts"
-        tools:layout="@layout/fragment_posts" />
+        tools:layout="@layout/fragment_posts">
+
+        <action
+            android:id="@+id/action_postsFragment_to_postDetailFragment"
+            app:destination="@id/postDetailFragment" />
+
+        <action
+            android:id="@+id/action_postsFragment_to_newPostFragment"
+            app:destination="@id/newPostFragment" />
+
+        <action
+            android:id="@+id/action_postsFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/eventsFragment"
         android:name="ru.netology.nework.ui.EventsFragment"
         android:label="@string/events"
-        tools:layout="@layout/fragment_events" />
+        tools:layout="@layout/fragment_events">
+
+        <action
+            android:id="@+id/action_eventsFragment_to_eventDetailFragment"
+            app:destination="@id/eventDetailFragment" />
+
+        <action
+            android:id="@+id/action_eventsFragment_to_newEventFragment"
+            app:destination="@id/newEventFragment" />
+
+        <action
+            android:id="@+id/action_eventsFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/usersFragment"
         android:name="ru.netology.nework.ui.UsersFragment"
         android:label="@string/users"
-        tools:layout="@layout/fragment_users" />
+        tools:layout="@layout/fragment_users">
 
-    <!-- Авторизация -->
+        <action
+            android:id="@+id/action_usersFragment_to_userDetailFragment"
+            app:destination="@id/userDetailFragment" />
+
+        <action
+            android:id="@+id/action_usersFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
+
+    </fragment>
+
     <fragment
         android:id="@+id/signInFragment"
         android:name="ru.netology.nework.ui.SignInFragment"
         android:label="Вход"
-        tools:layout="@layout/fragment_sign_in" />
+        tools:layout="@layout/fragment_sign_in">
+
+        <action
+            android:id="@+id/action_signInFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+
+        <action
+            android:id="@+id/action_signInFragment_to_postsFragment"
+            app:destination="@id/postsFragment"
+            app:popUpTo="@id/postsFragment"
+            app:popUpToInclusive="true" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/signUpFragment"
         android:name="ru.netology.nework.ui.SignUpFragment"
         android:label="Регистрация"
-        tools:layout="@layout/fragment_sign_up" />
+        tools:layout="@layout/fragment_sign_up">
 
-    <!-- Создание контента -->
+        <action
+            android:id="@+id/action_signUpFragment_to_postsFragment"
+            app:destination="@id/postsFragment"
+            app:popUpTo="@id/postsFragment"
+            app:popUpToInclusive="true" />
+
+    </fragment>
+
     <fragment
         android:id="@+id/newPostFragment"
         android:name="ru.netology.nework.ui.NewPostFragment"
         android:label="Новый пост"
-        tools:layout="@layout/fragment_new_post" />
+        tools:layout="@layout/fragment_new_post">
+
+        <action
+            android:id="@+id/action_newPostFragment_to_postsFragment"
+            app:destination="@id/postsFragment"
+            app:popUpTo="@id/postsFragment"
+            app:popUpToInclusive="true" />
+
+        <argument
+            android:name="postId"
+            app:argType="long"
+            android:defaultValue="0" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/newEventFragment"
         android:name="ru.netology.nework.ui.NewEventFragment"
         android:label="Новое событие"
-        tools:layout="@layout/fragment_new_event" />
+        tools:layout="@layout/fragment_new_event">
 
-    <!-- Детальные экраны -->
+        <action
+            android:id="@+id/action_newEventFragment_to_eventsFragment"
+            app:destination="@id/eventsFragment"
+            app:popUpTo="@id/eventsFragment"
+            app:popUpToInclusive="true" />
+
+        <argument
+            android:name="eventId"
+            app:argType="long"
+            android:defaultValue="0" />
+
+    </fragment>
+
     <fragment
         android:id="@+id/postDetailFragment"
         android:name="ru.netology.nework.ui.PostDetailFragment"
         android:label="Детали поста"
-        tools:layout="@layout/fragment_post_detail" />
+        tools:layout="@layout/fragment_post_detail">
+
+        <argument
+            android:name="postId"
+            app:argType="long" />
+
+        <action
+            android:id="@+id/action_postDetailFragment_to_postsFragment"
+            app:destination="@id/postsFragment"
+            app:popUpTo="@id/postsFragment"
+            app:popUpToInclusive="true" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/eventDetailFragment"
         android:name="ru.netology.nework.ui.EventDetailFragment"
         android:label="Детали события"
-        tools:layout="@layout/fragment_event_detail" />
+        tools:layout="@layout/fragment_event_detail">
 
-    <!-- Просмотр пользователя -->
+        <argument
+            android:name="eventId"
+            app:argType="long" />
+
+        <action
+            android:id="@+id/action_eventDetailFragment_to_eventsFragment"
+            app:destination="@id/eventsFragment"
+            app:popUpTo="@id/eventsFragment"
+            app:popUpToInclusive="true" />
+
+    </fragment>
+
     <fragment
         android:id="@+id/userDetailFragment"
         android:name="ru.netology.nework.ui.UserDetailFragment"
@@ -79,61 +182,46 @@
             app:argType="boolean"
             android:defaultValue="false" />
 
+        <action
+            android:id="@+id/action_userDetailFragment_to_usersFragment"
+            app:destination="@id/usersFragment"
+            app:popUpTo="@id/usersFragment"
+            app:popUpToInclusive="true" />
+
     </fragment>
 
-    <!-- Мой профиль -->
     <fragment
         android:id="@+id/myProfileFragment"
         android:name="ru.netology.nework.ui.MyProfileFragment"
         android:label="Мой профиль"
-        tools:layout="@layout/fragment_user_detail" />
+        tools:layout="@layout/fragment_user_detail">
 
-    <!-- Навигация между основными экранами -->
-    <action
-        android:id="@+id/action_postsFragment_to_signInFragment"
-        app:destination="@id/signInFragment" />
+        <action
+            android:id="@+id/action_myProfileFragment_to_postsFragment"
+            app:destination="@id/postsFragment"
+            app:popUpTo="@id/postsFragment"
+            app:popUpToInclusive="true" />
 
-    <action
-        android:id="@+id/action_eventsFragment_to_signInFragment"
-        app:destination="@id/signInFragment" />
+    </fragment>
 
-    <action
-        android:id="@+id/action_usersFragment_to_signInFragment"
-        app:destination="@id/signInFragment" />
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="ru.netology.nework.ui.MapFragment"
+        android:label="Выбор локации"
+        tools:layout="@layout/fragment_map">
 
-    <!-- Навигация к созданию контента -->
-    <action
-        android:id="@+id/action_postsFragment_to_newPostFragment"
-        app:destination="@id/newPostFragment" />
+        <action
+            android:id="@+id/action_mapFragment_to_newPostFragment"
+            app:destination="@id/newPostFragment" />
 
-    <action
-        android:id="@+id/action_eventsFragment_to_newEventFragment"
-        app:destination="@id/newEventFragment" />
+        <action
+            android:id="@+id/action_mapFragment_to_newEventFragment"
+            app:destination="@id/newEventFragment" />
 
-    <!-- Навигация к детальному просмотру -->
-    <action
-        android:id="@+id/action_postsFragment_to_postDetailFragment"
-        app:destination="@id/postDetailFragment">
-
-        <argument
-            android:name="postId"
-            app:argType="long" />
-
-    </action>
+    </fragment>
 
     <action
-        android:id="@+id/action_eventsFragment_to_eventDetailFragment"
-        app:destination="@id/eventDetailFragment">
-
-        <argument
-            android:name="eventId"
-            app:argType="long" />
-
-    </action>
-
-    <!-- Навигация к профилю пользователя -->
-    <action
-        android:id="@+id/action_usersFragment_to_userDetailFragment"
+        android:id="@+id/action_global_userDetailFragment"
         app:destination="@id/userDetailFragment">
 
         <argument
@@ -147,58 +235,10 @@
 
     </action>
 
-    <!-- Глобальная навигация к своему профилю -->
     <action
         android:id="@+id/action_global_myProfileFragment"
-        app:destination="@id/myProfileFragment" />
-
-    <!-- Навигация назад (pop) -->
-    <action
-        android:id="@+id/action_signInFragment_to_postsFragment"
-        app:destination="@id/postsFragment"
-        app:popUpTo="@id/postsFragment"
-        app:popUpToInclusive="true" />
-
-    <action
-        android:id="@+id/action_signUpFragment_to_postsFragment"
-        app:destination="@id/postsFragment"
-        app:popUpTo="@id/postsFragment"
-        app:popUpToInclusive="true" />
-
-    <action
-        android:id="@+id/action_newPostFragment_to_postsFragment"
-        app:destination="@id/postsFragment"
-        app:popUpTo="@id/postsFragment"
-        app:popUpToInclusive="true" />
-
-    <action
-        android:id="@+id/action_newEventFragment_to_eventsFragment"
-        app:destination="@id/eventsFragment"
-        app:popUpTo="@id/eventsFragment"
-        app:popUpToInclusive="true" />
-
-    <action
-        android:id="@+id/action_postDetailFragment_to_postsFragment"
-        app:destination="@id/postsFragment"
-        app:popUpTo="@id/postsFragment"
-        app:popUpToInclusive="true" />
-
-    <action
-        android:id="@+id/action_eventDetailFragment_to_eventsFragment"
-        app:destination="@id/eventsFragment"
-        app:popUpTo="@id/eventsFragment"
-        app:popUpToInclusive="true" />
-
-    <action
-        android:id="@+id/action_userDetailFragment_to_usersFragment"
-        app:destination="@id/usersFragment"
-        app:popUpTo="@id/usersFragment"
-        app:popUpToInclusive="true" />
-
-    <action
-        android:id="@+id/action_myProfileFragment_to_postsFragment"
-        app:destination="@id/postsFragment"
-        app:popUpTo="@id/postsFragment"
-        app:popUpToInclusive="true" />
+        app:destination="@id/myProfileFragment"
+        app:popUpTo="@id/nav_graph"
+        app:popUpToInclusive="false" />
 
 </navigation>

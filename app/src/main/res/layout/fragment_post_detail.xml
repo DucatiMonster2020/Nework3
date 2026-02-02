@@ -31,7 +31,6 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Информация об авторе -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -66,7 +65,6 @@
                         android:textSize="14sp"
                         android:textColor="?android:attr/textColorSecondary" />
 
-                    <!-- Последнее место работы (ТЗ) -->
                     <TextView
                         android:id="@+id/authorJob"
                         android:layout_width="wrap_content"
@@ -77,7 +75,6 @@
 
                 </LinearLayout>
 
-                <!-- Кнопка меню -->
                 <ImageButton
                     android:id="@+id/menuButton"
                     android:layout_width="wrap_content"
@@ -89,7 +86,6 @@
 
             </LinearLayout>
 
-            <!-- Контент поста -->
             <TextView
                 android:id="@+id/content"
                 android:layout_width="match_parent"
@@ -98,7 +94,6 @@
                 android:textSize="16sp"
                 android:lineSpacingExtra="4dp" />
 
-            <!-- Вложение -->
             <LinearLayout
                 android:id="@+id/attachmentContainer"
                 android:layout_width="match_parent"
@@ -139,7 +134,6 @@
 
             </LinearLayout>
 
-            <!-- Ссылка -->
             <LinearLayout
                 android:id="@+id/linkContainer"
                 android:layout_width="match_parent"
@@ -165,7 +159,6 @@
 
             </LinearLayout>
 
-            <!-- Лайки -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -189,7 +182,6 @@
 
             </LinearLayout>
 
-            <!-- Упомянутые пользователи (ТЗ) - просто список -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/mentionsList"
                 android:layout_width="match_parent"
@@ -197,7 +189,6 @@
                 android:layout_marginBottom="16dp"
                 android:visibility="gone" />
 
-            <!-- Карта (ТЗ) -->
             <LinearLayout
                 android:id="@+id/mapContainer"
                 android:layout_width="match_parent"

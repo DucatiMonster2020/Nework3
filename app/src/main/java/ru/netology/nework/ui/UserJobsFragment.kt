@@ -49,7 +49,6 @@ class UserJobsFragment : Fragment() {
     private val adapter by lazy {
         JobsAdapter(
             onItemClickListener = { job ->
-                // По ТЗ: просто показываем информацию в карточке
                 Snackbar.make(binding.root, "${job.name}: ${job.position}", Snackbar.LENGTH_SHORT).show()
             }
         )
@@ -136,7 +135,6 @@ class UserJobsFragment : Fragment() {
         binding.addJobFab.apply {
             isVisible = isCurrentUser
             setOnClickListener {
-                // Для своего профиля (п.7 ТЗ)
                 Snackbar.make(binding.root, "Добавить работу", Snackbar.LENGTH_SHORT).show()
             }
         }

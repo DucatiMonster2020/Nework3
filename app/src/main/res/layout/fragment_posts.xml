@@ -19,7 +19,6 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <!-- Состояние загрузки -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
@@ -27,7 +26,6 @@
         android:layout_gravity="center"
         android:visibility="gone" />
 
-    <!-- Состояние "пустой список" -->
     <LinearLayout
         android:id="@+id/emptyContainer"
         android:layout_width="wrap_content"

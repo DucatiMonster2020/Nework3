@@ -1,5 +1,6 @@
 package ru.netology.nework.ui
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -105,7 +106,7 @@ class UserWallFragment : Fragment() {
             setSupportActionBar(binding.toolbar)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.title = getString(R.string.user_wall) // Временный заголовок
+            supportActionBar?.title = getString(R.string.user_wall)
         }
 
         binding.toolbar.setNavigationOnClickListener {
@@ -121,28 +122,20 @@ class UserWallFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        // Наблюдаем за постами на стене
         viewModel.posts.observe(viewLifecycleOwner) { posts ->
             adapter.submitList(posts)
-
-            // Показываем/скрываем пустое состояние
             binding.emptyState.isVisible = posts.isEmpty()
             binding.postsList.isVisible = posts.isNotEmpty()
         }
-
-        // Наблюдаем за информацией о пользователе
         viewModel.user.observe(viewLifecycleOwner) { user ->
             user?.let {
                 updateUserInfo(it)
             }
         }
 
-        // Наблюдаем за последним местом работы
         viewModel.lastJob.observe(viewLifecycleOwner) { job ->
             binding.userJob.text = job ?: getString(R.string.looking_for_job)
         }
-
-        // Наблюдаем за состоянием загрузки
         viewModel.loading.observe(viewLifecycleOwner) { loading ->
             binding.progressBar.isVisible = loading
             binding.swipeRefresh.isRefreshing = loading
@@ -151,8 +144,6 @@ class UserWallFragment : Fragment() {
                 binding.swipeRefresh.isRefreshing = false
             }
         }
-
-        // Наблюдаем за ошибками
         viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
                 showError(it)
@@ -161,16 +152,12 @@ class UserWallFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        // Обновление по свайпу
         binding.swipeRefresh.setOnRefreshListener {
             refreshUserWall()
         }
-
-        // FAB для создания поста (только для своей стены)
         binding.fab.apply {
             isVisible = isCurrentUser
             setOnClickListener {
-                // Проверяем авторизацию
                 if (appAuth.authState.value?.id != 0L) {
                     navigateToCreatePost()
                 } else {
@@ -179,7 +166,6 @@ class UserWallFragment : Fragment() {
             }
         }
 
-        // Кнопка Retry в empty state
         binding.retryButton.setOnClickListener {
             loadUserWall()
         }
@@ -198,13 +184,10 @@ class UserWallFragment : Fragment() {
     }
 
     private fun updateUserInfo(user: ru.netology.nework.dto.User) {
-        // По ТЗ п.6: "имя и логин в AppBar"
         if (isAdded) {
             (activity as? AppCompatActivity)?.supportActionBar?.title = user.name
             binding.toolbar.subtitle = "@${user.login}"
         }
-
-        // Загружаем аватар
         if (!user.avatar.isNullOrEmpty()) {
             Glide.with(requireContext())
                 .load(user.avatar)
@@ -215,14 +198,11 @@ class UserWallFragment : Fragment() {
         } else {
             binding.userAvatar.setImageResource(R.drawable.author_avatar)
         }
-
-        // Обновляем информацию в шапке
         binding.userName.text = user.name
         binding.userLogin.text = "@${user.login}"
     }
 
     private fun showPostMenu(post: Post) {
-        // Показываем меню только если пост принадлежит текущему пользователю
         val canEdit = post.ownedByMe || isCurrentUser
 
         if (canEdit) {
@@ -244,23 +224,23 @@ class UserWallFragment : Fragment() {
 
     private fun showLoginRequiredDialog() {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.login_required))
-            .setMessage(getString(R.string.please_login_to_create_post))
-            .setPositiveButton(getString(R.string.sign_in)) { _, _ ->
-                // TODO: переход к экрану входа
-                showSnackbar("Переход к экрану входа")
+            .setTitle("Требуется вход")
+            .setMessage("Для этого действия нужно войти в аккаунт")
+            .setPositiveButton("Войти") { _, _ ->
+                findNavController().navigate(R.id.action_postsFragment_to_signInFragment)
             }
-            .setNegativeButton(R.string.cancel, null)
+            .setNegativeButton("Регистрация") { _, _ ->
+                findNavController().navigate(R.id.signUpFragment)
+            }
+            .setNeutralButton("Отмена", null)
             .show()
     }
 
     private fun navigateToCreatePost() {
-        // TODO: Реализовать навигацию к созданию поста
         showSnackbar("Создать новый пост")
     }
 
     private fun navigateToEditPost(postId: Long) {
-        // TODO: Реализовать навигацию к редактированию поста
         showSnackbar("Редактировать пост $postId")
     }
 
@@ -279,7 +259,7 @@ class UserWallFragment : Fragment() {
         try {
             val intent = android.content.Intent(
                 android.content.Intent.ACTION_VIEW,
-                android.net.Uri.parse(url)
+                Uri.parse(url)
             )
             startActivity(intent)
         } catch (e: Exception) {
@@ -307,7 +287,6 @@ class UserWallFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // При возвращении на экран обновляем данные
         refreshUserWall()
     }
 

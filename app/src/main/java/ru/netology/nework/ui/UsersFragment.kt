@@ -8,6 +8,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,9 +28,13 @@ class UsersFragment : Fragment() {
     private val adapter by lazy {
         UsersAdapter(
             onItemClickListener = { user ->
-                // TODO: переход к профилю пользователя
-                // Пока просто показываем Snackbar
-                Snackbar.make(binding.root, "Пользователь: ${user.name}", Snackbar.LENGTH_SHORT).show()
+                findNavController().navigate(
+                    R.id.action_usersFragment_to_userDetailFragment,
+                    Bundle().apply {
+                        putLong("userId", user.id)
+                        putBoolean("isCurrentUser", false)
+                    }
+                )
             }
         )
     }
@@ -60,11 +65,8 @@ class UsersFragment : Fragment() {
     private fun setupObservers() {
         viewModel.users.observe(viewLifecycleOwner) { users ->
             adapter.submitList(users)
-
-            // Простое сообщение если нет пользователей
             if (users.isEmpty()) {
                 binding.usersList.isVisible = false
-                // Можно показать простой TextView
             } else {
                 binding.usersList.isVisible = true
             }
@@ -81,7 +83,6 @@ class UsersFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        // Обновление по свайпу
         binding.swipeRefresh.setOnRefreshListener {
             refreshUsers()
         }

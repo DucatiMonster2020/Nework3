@@ -22,8 +22,6 @@ import ru.netology.nework.dto.Token
 import ru.netology.nework.dto.User
 
 interface ApiService {
-
-    // ========== POSTS ==========
     @GET("api/posts")
     suspend fun getAllPosts(): Response<List<Post>>
 
@@ -57,7 +55,6 @@ interface ApiService {
     @DELETE("api/posts/{id}/likes")
     suspend fun dislikePost(@Path("id") id: Long): Response<Post>
 
-    // ========== EVENTS ==========
     @GET("api/events")
     suspend fun getAllEvents(): Response<List<Event>>
 
@@ -97,7 +94,6 @@ interface ApiService {
     @DELETE("api/events/{id}/participants")
     suspend fun cancelParticipation(@Path("id") id: Long): Response<Event>
 
-    // ========== USERS ==========
     @GET("api/users")
     suspend fun getAllUsers(): Response<List<User>>
 
@@ -122,7 +118,6 @@ interface ApiService {
     @POST("api/users/push-tokens")
     suspend fun savePushToken(@Body token: PushToken): Response<Unit>
 
-    // ========== JOBS ==========
     @GET("api/my/jobs")
     suspend fun getMyJobs(): Response<List<Job>>
 
@@ -135,12 +130,10 @@ interface ApiService {
     @DELETE("api/my/jobs/{id}")
     suspend fun deleteJob(@Path("id") id: Long): Response<Unit>
 
-    // ========== MEDIA ==========
     @Multipart
     @POST("api/media")
     suspend fun upload(@Part file: MultipartBody.Part): Response<Media>
 
-    // ========== WALL ==========
     @GET("api/{authorId}/wall")
     suspend fun getUserWall(@Path("authorId") authorId: Long): Response<List<Post>>
 }

@@ -32,12 +32,9 @@ object ApiServiceModule {
     @Singleton
     @Provides
     fun provideMainInterceptor(auth: AppAuth): Interceptor = Interceptor { chain ->
-        // 1. Добавляем API Key (обязательно по ТЗ)
         var request = chain.request().newBuilder()
             .addHeader("Api-Key", BuildConfig.API_KEY)
             .build()
-
-// 2. Добавляем Authorization, если пользователь авторизован
         val token = auth.token
         if (!token.isNullOrEmpty()) {
             request = request.newBuilder()
@@ -52,7 +49,7 @@ object ApiServiceModule {
     @Provides
     fun provideOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
-        mainInterceptor: Interceptor  // Только один интерцептор!
+        mainInterceptor: Interceptor
     ): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(mainInterceptor)
         .addInterceptor(loggingInterceptor)

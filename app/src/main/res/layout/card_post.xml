@@ -16,7 +16,6 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- Аватар автора -->
         <ImageView
             android:id="@+id/authorAvatar"
             android:layout_width="40dp"
@@ -25,7 +24,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Имя автора -->
         <TextView
             android:id="@+id/authorName"
             android:layout_width="0dp"
@@ -39,7 +37,6 @@
             app:layout_constraintStart_toEndOf="@id/authorAvatar"
             app:layout_constraintTop_toTopOf="@id/authorAvatar" />
 
-        <!-- Дата публикации -->
         <TextView
             android:id="@+id/publishedTime"
             android:layout_width="0dp"
@@ -52,7 +49,6 @@
             app:layout_constraintStart_toStartOf="@id/authorName"
             app:layout_constraintTop_toBottomOf="@id/authorName" />
 
-        <!-- Кнопка меню -->
         <ImageButton
             android:id="@+id/menuButton"
             android:layout_width="24dp"
@@ -65,7 +61,6 @@
             app:srcCompat="@drawable/ic_more_vert_24"
             app:tint="@color/on_surface_variant" />
 
-        <!-- Контент поста -->
         <TextView
             android:id="@+id/content"
             android:layout_width="0dp"
@@ -81,7 +76,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/authorAvatar" />
 
-        <!-- Вложение -->
         <LinearLayout
             android:id="@+id/attachmentContainer"
             android:layout_width="0dp"
@@ -134,7 +128,6 @@
 
         </LinearLayout>
 
-        <!-- Ссылка -->
         <LinearLayout
             android:id="@+id/linkContainer"
             android:layout_width="0dp"
@@ -170,7 +163,6 @@
 
         </LinearLayout>
 
-        <!-- Лайки -->
         <LinearLayout
             android:id="@+id/likesContainer"
             android:layout_width="wrap_content"

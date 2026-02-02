@@ -11,7 +11,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Поле ввода текста -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -27,7 +26,6 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Кнопка выбора локации -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/locationButton"
             android:layout_width="match_parent"
@@ -38,7 +36,6 @@
             android:drawableStart="@drawable/ic_location_pin"
             android:drawablePadding="8dp" />
 
-        <!-- Кнопка выбора упомянутых пользователей -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/mentionsButton"
             android:layout_width="match_parent"
@@ -49,7 +46,6 @@
             android:drawableStart="@drawable/ic_users_24"
             android:drawablePadding="8dp" />
 
-        <!-- Кнопки выбора изображения -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -86,7 +82,6 @@
 
         </LinearLayout>
 
-        <!-- Кнопки выбора вложения -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -123,7 +118,6 @@
 
         </LinearLayout>
 
-        <!-- Информация о вложении -->
         <TextView
             android:id="@+id/attachmentType"
             android:layout_width="wrap_content"
@@ -131,7 +125,6 @@
             android:layout_marginTop="8dp"
             android:text="@string/no_attachment" />
 
-        <!-- Кнопка удаления вложения -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/removeAttachmentButton"
             android:layout_width="wrap_content"
@@ -141,7 +134,6 @@
             android:visibility="gone"
             style="?attr/materialButtonOutlinedStyle" />
 
-        <!-- Кнопка добавления ссылки -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/linkButton"
             android:layout_width="match_parent"
@@ -152,7 +144,6 @@
             android:drawableStart="@drawable/ic_link_24"
             android:drawablePadding="8dp" />
 
-        <!-- Поле для ввода ссылки -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/linkInput"
             android:layout_width="match_parent"
@@ -168,7 +159,6 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Прогресс-бар -->
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"

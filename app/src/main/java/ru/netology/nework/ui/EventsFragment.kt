@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nework.R
@@ -30,7 +31,6 @@ class EventsFragment : Fragment() {
                 viewModel.likeById(event.id)
             },
             onItemClickListener = { event ->
-                // Переход к деталям события
                 findNavController().navigate(
                     R.id.action_eventsFragment_to_eventDetailFragment,
                     Bundle().apply {
@@ -75,45 +75,32 @@ class EventsFragment : Fragment() {
     private fun setupObservers() {
         viewModel.dataState.observe(viewLifecycleOwner) { state ->
             adapter.submitList(state.events)
-
-            // Показываем/скрываем сообщение о пустом списке
             binding.emptyContainer.isVisible = state.empty
             binding.emptyTitle.isVisible = state.empty
             binding.emptySubtitle.isVisible = state.empty
             binding.retryButton.isVisible = state.empty
         }
         viewModel.state.observe(viewLifecycleOwner) { state ->
-            // Состояние загрузки
             binding.progressBar.isVisible = state.loading
             binding.swipeRefresh.isRefreshing = state.refreshing
-
-            // Ошибка
             if (state.error) {
                 showError(state.errorMessage)
             }
-
-            // Блокируем/разблокируем UI
             binding.eventsList.isEnabled = !state.loading
             binding.fab.isEnabled = !state.loading
         }
     }
 
     private fun setupListeners() {
-        // Обновление по свайпу
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.refreshEvents()
         }
-
-        // Кнопка Retry
         binding.retryButton.setOnClickListener {
             viewModel.loadEvents()
         }
-
-        // FAB для создания события
         binding.fab.setOnClickListener {
             val isAuthorized = AuthStateManager.authState.value is AuthStateManager.AuthState.Authorized
             if (isAuthorized) {
-                // Переход к созданию события
                 findNavController().navigate(R.id.action_eventsFragment_to_newEventFragment)
             } else {
                 showLoginRequiredDialog()
@@ -122,11 +109,20 @@ class EventsFragment : Fragment() {
     }
 
     private fun showLoginRequiredDialog() {
-        showSnackbar("Please sign in to create new event")
+        MaterialAlertDialogBuilder(requireContext())
+        .setTitle("Требуется вход")
+            .setMessage("Для этого действия нужно войти в аккаунт")
+            .setPositiveButton("Войти") { _, _ ->
+                findNavController().navigate(R.id.action_postsFragment_to_signInFragment)
+            }
+            .setNegativeButton("Регистрация") { _, _ ->
+                findNavController().navigate(R.id.signUpFragment)
+            }
+            .setNeutralButton("Отмена", null)
+            .show()
     }
 
     private fun showEventMenu(event: ru.netology.nework.dto.Event) {
-        // По ТЗ: меню для автора с удалением/редактированием
         Snackbar.make(binding.root, "Menu for event ${event.id}", Snackbar.LENGTH_SHORT).show()
     }
 
@@ -138,7 +134,6 @@ class EventsFragment : Fragment() {
             }
             .show()
     }
-
     private fun showSnackbar(message: String) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
     }

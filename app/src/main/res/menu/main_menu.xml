@@ -2,7 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- Для неавторизованных пользователей -->
     <item
         android:id="@+id/sign_in"
         android:title="@string/sign_in"
@@ -13,7 +12,6 @@
         android:title="@string/sign_up"
         app:showAsAction="never" />
 
-    <!-- Для авторизованных пользователей -->
     <item
         android:id="@+id/profile"
         android:title="@string/profile"

@@ -54,7 +54,6 @@ class SignInFragment : Fragment() {
 
         viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
-                // По ТЗ: при 400 коде "Неправильный логин или пароль"
                 if (it.contains("400")) {
                     Snackbar.make(binding.root, "Неправильный логин или пароль", Snackbar.LENGTH_LONG).show()
                 } else {
@@ -65,7 +64,6 @@ class SignInFragment : Fragment() {
 
         viewModel.success.observe(viewLifecycleOwner) { success ->
             if (success) {
-                // Успешный вход - возвращаемся назад
                 findNavController().popBackStack()
             }
         }
@@ -77,11 +75,8 @@ class SignInFragment : Fragment() {
         }
 
         binding.signUpButton.setOnClickListener {
-            // Переход к регистрации
             findNavController().navigate(R.id.signUpFragment)
         }
-
-        // Валидация полей в реальном времени
         binding.loginInput.editText?.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
                 validateLogin()
@@ -96,7 +91,6 @@ class SignInFragment : Fragment() {
     }
 
     private fun signIn() {
-        // По ТЗ: проверка основных ограничений
         val login = binding.loginInput.editText?.text.toString().trim()
         val password = binding.passwordInput.editText?.text.toString().trim()
 

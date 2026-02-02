@@ -61,11 +61,9 @@ class PostsViewModel @Inject constructor(
     fun likeById(id: Long) {
         viewModelScope.launch {
             try {
-                // Находим пост для обновления UI сразу
                 val currentPosts = _dataState.value?.posts ?: emptyList()
                 val post = currentPosts.find { it.id == id }
                 post?.let { originalPost ->
-                    // Оптимистичное обновление
                     val updatedPost = originalPost.copy(
                         likedByMe = !originalPost.likedByMe,
                         likeOwnerIds = if (originalPost.likedByMe) {
@@ -80,8 +78,6 @@ class PostsViewModel @Inject constructor(
                     }
 
                     _dataState.value = _dataState.value?.copy(posts = newPosts)
-
-                    // Отправляем запрос на сервер
                     if (updatedPost.likedByMe) {
                         repository.likeById(id)
                     } else {
@@ -90,7 +86,6 @@ class PostsViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _state.value = FeedModelState.error("Failed to like post")
-                // Откатываем изменения в случае ошибки
                 loadPosts()
             }
         }
@@ -99,16 +94,13 @@ class PostsViewModel @Inject constructor(
     fun removeById(id: Long) {
         viewModelScope.launch {
             try {
-                // Оптимистичное удаление
                 val currentPosts = _dataState.value?.posts ?: emptyList()
                 val newPosts = currentPosts.filter { it.id != id }
                 _dataState.value = _dataState.value?.copy(posts = newPosts)
-
-                // Отправляем запрос на сервер
                 repository.removeById(id)
             } catch (e: Exception) {
                 _state.value = FeedModelState.error("Failed to delete post")
-                loadPosts() // Перезагружаем в случае ошибки
+                loadPosts()
             }
         }
     }

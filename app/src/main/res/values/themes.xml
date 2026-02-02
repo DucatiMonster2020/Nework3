@@ -1,45 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Основная тема приложения - минимальная, по ТЗ -->
     <style name="Theme.NeWork" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Primary color - фиолетовый для AppBar из макетов Figma -->
         <item name="colorPrimary">#4F378B</item>
-        <item name="colorPrimaryDark">#4F378B</item> <!-- Для статус бара -->
+        <item name="colorPrimaryDark">#4F378B</item>
         <item name="colorOnPrimary">#FFFFFF</item>
-
-        <!-- Secondary color - сиреневый для кнопок из макетов -->
         <item name="colorSecondary">#6750A4</item>
         <item name="colorOnSecondary">#FFFFFF</item>
-
-        <!-- Surface colors - белый фон как в макетах -->
         <item name="colorSurface">#FFFFFF</item>
-        <item name="colorOnSurface">#000000</item> <!-- Черный текст -->
-
-        <!-- Background -->
+        <item name="colorOnSurface">#000000</item>
         <item name="android:windowBackground">#FFFFFF</item>
         <item name="colorOnBackground">#000000</item>
-
-        <!-- Error color -->
         <item name="colorError">#B3261E</item>
         <item name="colorOnError">#FFFFFF</item>
-
-        <!-- Status bar -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
-
-        <!-- AppBar стиль -->
         <item name="actionBarSize">64dp</item>
-
-        <!-- Кнопки - скругленные как в макетах -->
         <item name="materialButtonStyle">@style/Widget.NeWork.Button</item>
         <item name="materialButtonOutlinedStyle">@style/Widget.NeWork.Button.Outlined</item>
-
-        <!-- Bottom Navigation -->
         <item name="bottomNavigationStyle">@style/Widget.NeWork.BottomNavigationView</item>
     </style>
-
-    <!-- Toolbar стиль -->
     <style name="Widget.NeWork.Toolbar" parent="Widget.AppCompat.Toolbar">
         <item name="titleTextColor">@android:color/white</item>
         <item name="subtitleTextColor">@android:color/white</item>
@@ -47,8 +27,6 @@
         <item name="android:minHeight">64dp</item>
         <item name="background">?attr/colorPrimary</item>
     </style>
-
-    <!-- Кнопки - скругленные 100dp как в макетах -->
     <style name="Widget.NeWork.Button" parent="Widget.MaterialComponents.Button">
         <item name="backgroundTint">?attr/colorSecondary</item>
         <item name="android:textColor">?attr/colorOnSecondary</item>
@@ -58,8 +36,6 @@
         <item name="android:paddingStart">24dp</item>
         <item name="android:paddingEnd">24dp</item>
     </style>
-
-    <!-- Контурные кнопки -->
     <style name="Widget.NeWork.Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="strokeColor">?attr/colorSecondary</item>
         <item name="strokeWidth">1dp</item>
@@ -70,8 +46,6 @@
         <item name="android:paddingStart">24dp</item>
         <item name="android:paddingEnd">24dp</item>
     </style>
-
-    <!-- Bottom Navigation -->
     <style name="Widget.NeWork.BottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
         <item name="itemIconTint">@drawable/bottom_nav_icon_colors</item>
         <item name="itemTextColor">@drawable/bottom_nav_text_colors</item>

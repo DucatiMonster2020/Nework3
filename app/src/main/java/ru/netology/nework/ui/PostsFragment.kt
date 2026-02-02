@@ -7,11 +7,15 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import ru.netology.nework.R
 import ru.netology.nework.adapter.PostsAdapter
 import ru.netology.nework.auth.AuthStateManager
+import ru.netology.nework.auth.AuthStateManager.authState
 import ru.netology.nework.databinding.FragmentPostsBinding
 import ru.netology.nework.dto.Post
 import ru.netology.nework.viewmodel.PostsViewModel
@@ -29,25 +33,25 @@ class PostsFragment : Fragment() {
                 viewModel.likeById(post.id)
             },
             onItemClickListener = { post ->
-                // TODO: переход к деталям
-                showSnackbar("Clicked post: ${post.id}")
+                findNavController().navigate(
+                    R.id.action_postsFragment_to_postDetailFragment,
+                    Bundle().apply {
+                        putLong("postId", post.id)
+                    }
+                )
             },
             onMenuClickListener = { post ->
-                // TODO: показать меню удаления/редактирования
                 showPostMenu(post)
             },
             onAttachmentClickListener = { url ->
                 showSnackbar("Attachment: $url")
-                // TODO: открыть вложение
             },
             onLinkClickListener = { url ->
                 showSnackbar("Link: $url")
-                // TODO: открыть в браузере
             }
         )
     }
     private fun showPostMenu(post: Post) {
-        // TODO: показать диалог с опциями удалить/редактировать
         showSnackbar("Menu for post ${post.id}")
     }
 
@@ -76,53 +80,51 @@ class PostsFragment : Fragment() {
     private fun setupObservers() {
         viewModel.dataState.observe(viewLifecycleOwner) { state ->
             adapter.submitList(state.posts)
-
-            // Показываем/скрываем сообщение о пустом списке
             binding.emptyContainer.isVisible = state.empty
             binding.emptyTitle.isVisible = state.empty
             binding.emptySubtitle.isVisible = state.empty
-
-            // Показываем/скрываем кнопку Retry при ошибке
             binding.retryButton.isVisible = state.empty
         }
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
-            // Состояние загрузки
             binding.progressBar.isVisible = state.loading
             binding.swipeRefresh.isRefreshing = state.refreshing
             if (state.error) {
                 showError(state.errorMessage)
             }
-
-            // Блокируем/разблокируем UI в зависимости от состояния
             binding.postsList.isEnabled = !state.loading
             binding.fab.isEnabled = !state.loading
         }
     }
 
     private fun setupListeners() {
-        // Обновление по свайпу
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.refreshPosts()
         }
-
-        // Кнопка Retry
         binding.retryButton.setOnClickListener {
             viewModel.loadPosts()
         }
 
-        // FAB для создания поста
         binding.fab.setOnClickListener {
-            val isAuthorized = AuthStateManager.authState.value is AuthStateManager.AuthState.Authorized
-            if (isAuthorized) {
-                showSnackbar("Create new post")
+            if (authState.value?.id != 0L) {
+                findNavController().navigate(R.id.action_postsFragment_to_newPostFragment)
             } else {
                 showLoginRequiredDialog()
             }
         }
     }
     private fun showLoginRequiredDialog() {
-        showSnackbar("Please sign in to create new post")
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Требуется вход")
+            .setMessage("Для этого действия нужно войти в аккаунт")
+            .setPositiveButton("Войти") { _, _ ->
+                findNavController().navigate(R.id.action_postsFragment_to_signInFragment)
+            }
+            .setNegativeButton("Регистрация") { _, _ ->
+                findNavController().navigate(R.id.signUpFragment)
+            }
+            .setNeutralButton("Отмена", null)
+            .show()
     }
 
     private fun showError(message: String?) {

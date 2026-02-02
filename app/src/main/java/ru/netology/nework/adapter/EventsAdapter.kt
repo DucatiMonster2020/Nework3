@@ -53,7 +53,6 @@ class EventsAdapter(
 
         fun bind(event: Event) {
             binding.apply {
-                // Аватар автора
                 event.authorAvatar?.let { avatar ->
                     if (avatar.isNotBlank()) {
                         Glide.with(authorAvatar)
@@ -67,20 +66,12 @@ class EventsAdapter(
                 } ?: run {
                     authorAvatar.setImageResource(R.drawable.author_avatar)
                 }
-
-                // Имя автора
                 authorName.text = event.author
-
-                // Дата публикации
                 publishedTime.text = event.formattedPublished
-
-                // Тип события
                 eventType.text = when (event.type) {
                     EventType.ONLINE -> "ONLINE"
                     EventType.OFFLINE -> "OFFLINE"
                 }
-
-                // Цвет типа события
                 val typeColor = when (event.type) {
                     EventType.ONLINE -> R.color.event_online
                     EventType.OFFLINE -> R.color.event_offline
@@ -88,14 +79,8 @@ class EventsAdapter(
                 eventType.setBackgroundColor(
                     ContextCompat.getColor(itemView.context, typeColor)
                 )
-
-                // Дата проведения (ТЗ: отдельное поле в карточке)
                 eventDateTime.text = event.formattedDateTime
-
-                // Контент
                 content.text = event.content
-
-                // Лайки
                 likeCount.text = event.likeOwnerIds.size.toString()
                 val likeIcon = if (event.likedByMe) {
                     R.drawable.ic_like_filled_24
@@ -103,8 +88,6 @@ class EventsAdapter(
                     R.drawable.ic_like_24
                 }
                 likeButton.setImageResource(likeIcon)
-
-                // Вложение
                 val hasAttachment = event.attachment != null
                 attachmentContainer.isVisible = hasAttachment
 
@@ -127,18 +110,12 @@ class EventsAdapter(
                         attachmentUrl.text = attachment.url
                     }
                 }
-
-                // Ссылка
                 val hasLink = !event.link.isNullOrBlank()
                 linkContainer.isVisible = hasLink
                 if (hasLink) {
                     linkText.text = event.link
                 }
-
-                // Кнопка меню (только для автора)
                 menuButton.isVisible = event.ownedByMe
-
-                // ========== ОБРАБОТЧИКИ ==========
                 likeButton.setOnClickListener { onLikeClickListener(event) }
                 menuButton.setOnClickListener { onMenuClickListener(event) }
 

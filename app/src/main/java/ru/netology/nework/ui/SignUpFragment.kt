@@ -26,10 +26,7 @@ class SignUpFragment : Fragment() {
     private val viewModel by viewModels<SignUpViewModel>()
     private var _binding: FragmentSignUpBinding? = null
     private val binding get() = _binding!!
-
     private var selectedImageUri: Uri? = null
-
-    // Простой контракт для выбора изображения из галереи
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
@@ -89,11 +86,8 @@ class SignUpFragment : Fragment() {
         }
 
         binding.avatarButton.setOnClickListener {
-            // Просто открываем выбор из галереи
             pickImageLauncher.launch("image/*")
         }
-
-        // Валидация при потере фокуса
         listOf(
             binding.loginInput,
             binding.nameInput,
@@ -186,7 +180,6 @@ class SignUpFragment : Fragment() {
 
     private fun loadImage(uri: Uri) {
         try {
-            // Простая загрузка превью без проверки размера (можно добавить позже)
             Glide.with(this)
                 .load(uri)
                 .circleCrop()

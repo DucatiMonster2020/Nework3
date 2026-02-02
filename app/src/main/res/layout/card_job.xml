@@ -13,8 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp">
-
-        <!-- Иконка компании -->
         <ImageView
             android:id="@+id/companyIcon"
             android:layout_width="40dp"
@@ -24,7 +22,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Название компании -->
         <TextView
             android:id="@+id/companyName"
             android:layout_width="0dp"
@@ -36,7 +33,6 @@
             app:layout_constraintStart_toEndOf="@id/companyIcon"
             app:layout_constraintTop_toTopOf="@id/companyIcon" />
 
-        <!-- Должность -->
         <TextView
             android:id="@+id/position"
             android:layout_width="0dp"
@@ -48,7 +44,6 @@
             app:layout_constraintStart_toStartOf="@id/companyName"
             app:layout_constraintTop_toBottomOf="@id/companyName" />
 
-        <!-- Период работы -->
         <TextView
             android:id="@+id/period"
             android:layout_width="0dp"
@@ -60,7 +55,6 @@
             app:layout_constraintStart_toStartOf="@id/position"
             app:layout_constraintTop_toBottomOf="@id/position" />
 
-        <!-- Ссылка на компанию (если есть) -->
         <TextView
             android:id="@+id/companyLink"
             android:layout_width="0dp"
@@ -74,7 +68,6 @@
             app:layout_constraintStart_toStartOf="@id/period"
             app:layout_constraintTop_toBottomOf="@id/period" />
 
-        <!-- Кнопка меню (только для своих работ) -->
         <ImageButton
             android:id="@+id/menuButton"
             android:layout_width="wrap_content"

@@ -19,7 +19,6 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <!-- Состояние загрузки -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
@@ -27,7 +26,6 @@
         android:layout_gravity="center"
         android:visibility="gone" />
 
-    <!-- Состояние "пустой список" -->
     <LinearLayout
         android:id="@+id/emptyContainer"
         android:layout_width="wrap_content"
@@ -73,7 +71,6 @@
 
     </LinearLayout>
 
-    <!-- FAB для создания события -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"

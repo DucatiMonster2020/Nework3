@@ -1,17 +1,20 @@
 package ru.netology.nework.viewmodel
 
 import android.net.Uri
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import ru.netology.nework.api.ApiService
 import ru.netology.nework.auth.AppAuth
 import ru.netology.nework.error.AppError
+import ru.netology.nework.utils.FileUtils
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,20 +38,22 @@ class SignUpViewModel @Inject constructor(
                 _loading.value = true
                 _error.value = null
                 _success.value = false
-
-                // ПРОСТАЯ регистрация БЕЗ аватара (по ТЗ достаточно)
+                var filePart: MultipartBody.Part? = null
+                avatarUri?.let { uri ->
+                    val inputStream = requireContext().contentResolver.openInputStream(uri)
+                    val file = FileUtils.createTempFile(requireContext(), uri)
+                    val requestFile = file.asRequestBody("image/*".toMediaType())
+                    filePart = MultipartBody.Part.createFormData("file", file.name, requestFile)
+                }
                 val loginBody = login.toRequestBody(MultipartBody.FORM)
                 val passwordBody = password.toRequestBody(MultipartBody.FORM)
                 val nameBody = name.toRequestBody(MultipartBody.FORM)
-
-                // Регистрируем без аватара (file = null)
                 val response = apiService.registerUser(
                     login = loginBody,
                     pass = passwordBody,
                     name = nameBody,
-                    file = null // Без аватара - соответствует ТЗ
+                    file = null
                 )
-
                 if (response.isSuccessful) {
                     val token = response.body()
                     token?.let {
@@ -58,7 +63,10 @@ class SignUpViewModel @Inject constructor(
                         _error.value = "Ошибка регистрации"
                     }
                 } else {
-                    _error.value = "HTTP ${response.code()}"
+                    when (response.code()) {
+                        400 -> _error.value = "Пользователь с таким логином уже зарегистрирован"
+                        else -> _error.value = "Ошибка: ${response.code()}"
+                    }
                 }
             } catch (e: Exception) {
                 _error.value = AppError.fromThrowable(e).message

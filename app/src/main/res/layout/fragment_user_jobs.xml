@@ -35,7 +35,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Список работ -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/jobsList"
                     android:layout_width="match_parent"
@@ -43,7 +42,6 @@
                     android:clipToPadding="false"
                     android:padding="8dp" />
 
-                <!-- Сообщение о пустом списке -->
                 <LinearLayout
                     android:id="@+id/emptyState"
                     android:layout_width="match_parent"
@@ -100,7 +98,6 @@
         android:layout_gravity="center"
         android:visibility="gone" />
 
-    <!-- FAB для добавления работы (только для своего профиля) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addJobFab"
         android:layout_width="wrap_content"

@@ -31,6 +31,11 @@ android {
         if (apiKey.isEmpty()) {
             throw GradleException("API_KEY не найден в local.properties")
         }
+        val yandexMapsApiKey = properties.getProperty("API_KEY_MAP", "")
+        buildConfigField("String", "YANDEX_MAPS_API_KEY", "\"$yandexMapsApiKey\"")
+        if (yandexMapsApiKey.isEmpty()) {
+            print("API_KEY_MAP не найден")
+        }
     }
 
     buildTypes {
@@ -101,6 +106,8 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.10.1")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     ksp("com.github.bumptech.glide:compiler:4.16.0")
+
+    implementation("com.yandex.android:maps.mobile:4.5.1-full")
 
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")

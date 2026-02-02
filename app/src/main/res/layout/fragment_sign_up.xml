@@ -10,7 +10,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Аватар -->
         <ImageView
             android:id="@+id/avatarImage"
             android:layout_width="100dp"
@@ -33,7 +32,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Логин -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/loginInput"
             android:layout_width="0dp"
@@ -53,7 +51,6 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Имя -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/nameInput"
             android:layout_width="0dp"
@@ -72,7 +69,6 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Пароль -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/passwordInput"
             android:layout_width="0dp"
@@ -91,7 +87,6 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Подтверждение пароля -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/passwordConfirmInput"
             android:layout_width="0dp"
@@ -110,7 +105,6 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Кнопка регистрации -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/signUpButton"
             android:layout_width="0dp"
@@ -121,7 +115,6 @@
             app:layout_constraintStart_toStartOf="@id/passwordConfirmInput"
             app:layout_constraintTop_toBottomOf="@id/passwordConfirmInput" />
 
-        <!-- Прогресс-бар -->
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"

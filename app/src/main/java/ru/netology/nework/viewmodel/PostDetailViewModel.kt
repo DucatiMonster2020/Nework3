@@ -41,8 +41,6 @@ class PostDetailViewModel @Inject constructor(
                 if (response.isSuccessful) {
                     val post = response.body()
                     _post.value = post
-
-                    // Загружаем упомянутых пользователей
                     post?.mentionIds?.let { loadMentionedUsers(it) }
                 } else {
                     _error.value = "Не удалось загрузить пост"
@@ -57,7 +55,6 @@ class PostDetailViewModel @Inject constructor(
 
     private suspend fun loadMentionedUsers(userIds: List<Long>) {
         try {
-            // Пока просто загружаем всех пользователей и фильтруем
             val response = apiService.getAllUsers()
             if (response.isSuccessful) {
                 val allUsers = response.body() ?: emptyList()
@@ -65,7 +62,6 @@ class PostDetailViewModel @Inject constructor(
                 _mentionedUsers.value = mentioned
             }
         } catch (e: Exception) {
-            // Игнорируем ошибку загрузки пользователей
         }
     }
 

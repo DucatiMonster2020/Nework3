@@ -35,14 +35,12 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Заголовок события -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginBottom="24dp">
 
-                <!-- Тип события -->
                 <TextView
                     android:id="@+id/eventType"
                     android:layout_width="wrap_content"
@@ -56,7 +54,6 @@
                     android:textStyle="bold"
                     android:layout_marginBottom="12dp" />
 
-                <!-- Дата и время события -->
                 <TextView
                     android:id="@+id/eventDateTime"
                     android:layout_width="wrap_content"
@@ -69,7 +66,6 @@
 
             </LinearLayout>
 
-            <!-- Информация об авторе -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -102,7 +98,6 @@
                         android:textStyle="bold"
                         android:textColor="@color/on_surface" />
 
-                    <!-- Последнее место работы (ТЗ) -->
                     <TextView
                         android:id="@+id/authorJob"
                         android:layout_width="wrap_content"
@@ -116,7 +111,6 @@
 
             </LinearLayout>
 
-            <!-- Контент события -->
             <TextView
                 android:id="@+id/content"
                 android:layout_width="match_parent"
@@ -127,7 +121,6 @@
                 android:textColor="@color/on_surface"
                 android:lineSpacingExtra="4dp" />
 
-            <!-- Вложение -->
             <LinearLayout
                 android:id="@+id/attachmentContainer"
                 android:layout_width="match_parent"
@@ -170,7 +163,6 @@
 
             </LinearLayout>
 
-            <!-- Ссылка -->
             <LinearLayout
                 android:id="@+id/linkContainer"
                 android:layout_width="match_parent"
@@ -197,7 +189,6 @@
 
             </LinearLayout>
 
-            <!-- Действия -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -205,7 +196,6 @@
                 android:layout_marginBottom="32dp"
                 android:gravity="center_vertical">
 
-                <!-- Лайки -->
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -233,7 +223,6 @@
 
                 </LinearLayout>
 
-                <!-- Участие -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/participateButton"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -245,7 +234,6 @@
 
             </LinearLayout>
 
-            <!-- Разделитель -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -253,7 +241,6 @@
                 android:alpha="0.12"
                 android:layout_marginBottom="24dp" />
 
-            <!-- Спикеры (ТЗ) -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -270,7 +257,6 @@
                 android:layout_marginBottom="32dp"
                 android:nestedScrollingEnabled="false" />
 
-            <!-- Разделитель -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -278,7 +264,6 @@
                 android:alpha="0.12"
                 android:layout_marginBottom="24dp" />
 
-            <!-- Участники (ТЗ) -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -295,7 +280,6 @@
                 android:layout_marginBottom="32dp"
                 android:nestedScrollingEnabled="false" />
 
-            <!-- Карта (ТЗ) - только для offline событий -->
             <LinearLayout
                 android:id="@+id/mapContainer"
                 android:layout_width="match_parent"

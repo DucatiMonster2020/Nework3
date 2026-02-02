@@ -1,33 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NeWork</string>
-
-    <!-- Навигация -->
     <string name="posts">Посты</string>
     <string name="events">События</string>
     <string name="users">Пользователи</string>
     <string name="profile">Профиль</string>
-
-
-
-    <!-- Сообщения -->
     <string name="no_posts">Нет постов</string>
     <string name="no_events">Нет событий</string>
     <string name="no_users">Нет пользователей</string>
     <string name="create_new_post">Создать новый пост</string>
     <string name="create_new_event">Создать новое событие</string>
-
-    <!-- Аватары -->
     <string name="author_avatar">Автор аватар</string>
     <string name="user_avatar">Пользователь аватар</string>
-
-    <!-- Общие -->
     <string name="link">Ссылка</string>
     <string name="loading">Загрузка...</string>
     <string name="error">Ошибка</string>
     <string name="retry">Retry</string>
-
-    <!-- Авторизация -->
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>
     <string name="sign_out">Sign Out</string>
@@ -35,11 +23,7 @@
     <string name="password">Password</string>
     <string name="name">Name</string>
     <string name="repeat_password">Repeat Password</string>
-
-    <!-- Регистрация -->
     <string name="select_photo">Выбрать фото</string>
-
-    <!-- Действия -->
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
@@ -54,12 +38,9 @@
     <string name="tap_to_retry">Tap to retry</string>
     <string name="unlike">Unlike</string>
     <string name="participate">Участвовать</string>
-
     <string name="wall_tab">Стена</string>
     <string name="jobs_tab">Работы</string>
     <string name="loading_user">Загрузка профиля...</string>
-
-
     <string name="user_jobs">Работы</string>
     <string name="one_job">1 работа</string>
     <plurals name="jobs_count">
@@ -68,29 +49,23 @@
         <item quantity="many">%d работ</item>
         <item quantity="other">%d работ</item>
     </plurals>
-
     <string name="position">Должность</string>
     <string name="period">Период</string>
     <string name="present">настоящее время</string>
     <string name="website">Сайт</string>
-
     <string name="no_jobs_found">Работы не найдены</string>
     <string name="no_jobs_description">У пользователя пока нет информации о местах работы</string>
     <string name="add_job">Добавить работу</string>
     <string name="edit_job">Редактировать</string>
     <string name="delete_job">Удалить</string>
     <string name="delete_job_confirmation">Удалить информацию об этой работе?</string>
-
     <string name="company_icon">Иконка компании</string>
     <string name="job_menu">Меню работы</string>
     <string name="cannot_open_link">Не удалось открыть ссылку</string>
-
-    <!-- Стена пользователя -->
     <string name="no_posts_on_wall">На стене пока нет постов</string>
     <string name="no_posts_description">Пользователь еще ничего не опубликовал</string>
     <string name="header_background">Фоновое изображение</string>
     <string name="add_post">Добавить пост</string>
-    <!-- Стена пользователя -->
     <string name="looking_for_job">В поиске работы</string>
     <string name="delete_post">Удалить пост</string>
     <string name="delete_post_confirmation">Удалить этот пост?</string>
@@ -101,16 +76,10 @@
     <string name="post_menu">Меню поста</string>
     <string name="mentioned_users">Упомянутые пользователи</string>
     <string name="map">Карта</string>
-
-    <!-- Общие ошибки -->
     <string name="unknown_error">Произошла неизвестная ошибка</string>
-
-    <!-- Работы пользователя -->
     <string name="no_jobs">Нет работ</string>
     <string name="user_wall">Стена пользователя</string>
     <string name="open_website">Открыть сайт</string>
-
-    <!-- Создание поста -->
     <string name="post_content">Текст поста</string>
     <string name="select_location">Выбрать локацию</string>
     <string name="select_mentioned_users">Выбрать упомянутых пользователей</string>
@@ -126,26 +95,22 @@
     <string name="post_options">Опции поста</string>
     <string name="login_required">Требуется вход</string>
     <string name="please_login_to_create_post">Войдите в аккаунт, чтобы создать пост</string>
-
-    <!-- Создание события -->
     <string name="event_content">Текст события</string>
     <string name="event_type">Тип события</string>
     <string name="online">Online</string>
     <string name="offline">Offline</string>
     <string name="select_event_date">Выбрать дату проведения</string>
     <string name="select_speakers">Выбрать спикеров</string>
-
     <string name="event_menu">Меню события</string>
     <string name="speakers">Спикеры</string>
     <string name="participants">Участники</string>
-
-
-    <!-- Мой профиль -->
     <string name="my_wall">Моя стена</string>
     <string name="my_jobs">Мои работы</string>
-
-
-
+    <string name="confirm_location">Подтвердить выбор</string>
+    <string name="select_location_on_map">Выберите место на карте</string>
+    <string name="location_selected">Местоположение выбрано</string>
+    <string name="location_not_selected">Местоположение не выбрано</string>
+    <string name="yandex_maps_api_key">Требуется API_KEY</string>
     <string name="description_post_author_avatar">Аватар автора поста</string>
     <string name="menu_edit">Изменить</string>
     <string name="menu_remove">Удалить</string>

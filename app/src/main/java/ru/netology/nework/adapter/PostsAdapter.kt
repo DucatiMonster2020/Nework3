@@ -50,9 +50,6 @@ class PostsAdapter(
 
         fun bind(post: Post) {
             binding.apply {
-                // ========== ОСНОВНАЯ ИНФОРМАЦИЯ ==========
-
-                // Аватар автора
                 if (!post.authorAvatar.isNullOrEmpty()) {
                     Glide.with(authorAvatar)
                         .load(post.authorAvatar)
@@ -62,15 +59,9 @@ class PostsAdapter(
                 } else {
                     authorAvatar.setImageResource(R.drawable.author_avatar)
                 }
-
-                // Имя автора и дата публикации
                 authorName.text = post.author
                 publishedTime.text = post.formattedDate
-
-                // Контент поста
                 content.text = post.content
-
-                // ========== ЛАЙКИ ==========
                 likeCount.text = post.likeOwnerIds.size.toString()
                 val likeIcon = if (post.likedByMe) {
                     R.drawable.ic_like_filled_24
@@ -78,14 +69,11 @@ class PostsAdapter(
                     R.drawable.ic_like_24
                 }
                 likeButton.setImageResource(likeIcon)
-
-                // ========== ВЛОЖЕНИЕ ==========
                 val hasAttachment = post.attachment != null
                 attachmentContainer.isVisible = hasAttachment
 
                 if (hasAttachment) {
                     post.attachment?.let { attachment ->
-                        // Иконка в зависимости от типа
                         when (attachment.type) {
                             AttachmentType.IMAGE -> {
                                 attachmentIcon.setImageResource(R.drawable.ic_image)
@@ -103,31 +91,19 @@ class PostsAdapter(
                         attachmentUrl.text = attachment.url
                     }
                 }
-
-                // ========== ССЫЛКА ==========
                 val hasLink = !post.link.isNullOrEmpty()
                 linkContainer.isVisible = hasLink
 
                 if (hasLink) {
                     linkText.text = post.link
                 }
-
-                // ========== МЕНЮ (только для автора) ==========
                 menuButton.isVisible = post.ownedByMe
-
-                // ========== ОБРАБОТЧИКИ КЛИКОВ ==========
-
-                // Лайк
                 likeButton.setOnClickListener {
                     onLikeClickListener(post)
                 }
-
-                // Меню
                 menuButton.setOnClickListener {
                     onMenuClickListener(post)
                 }
-
-                // Вложение
                 if (hasAttachment) {
                     attachmentContainer.setOnClickListener {
                         post.attachment?.url?.let { url ->
@@ -135,8 +111,6 @@ class PostsAdapter(
                         }
                     }
                 }
-
-                // Ссылка
                 if (hasLink) {
                     linkContainer.setOnClickListener {
                         post.link?.let { link ->
@@ -144,8 +118,6 @@ class PostsAdapter(
                         }
                     }
                 }
-
-                // Вся карточка
                 root.setOnClickListener {
                     onItemClickListener(post)
                 }

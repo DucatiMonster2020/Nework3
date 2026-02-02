@@ -36,7 +36,6 @@ class UsersAdapter(
 
         fun bind(user: User) {
             binding.apply {
-                // Аватар
                 if (!user.avatar.isNullOrEmpty()) {
                     Glide.with(userAvatar)
                         .load(user.avatar)
@@ -47,14 +46,10 @@ class UsersAdapter(
                 } else {
                     userAvatar.setImageResource(R.drawable.author_avatar)
                 }
-
-                // Информация о пользователе
                 userName.text = user.name
                 userName.typeface = Typeface.DEFAULT_BOLD
                 userLogin.text = "@${user.login}"
                 userLogin.setTextColor(ContextCompat.getColor(itemView.context, android.R.color.darker_gray))
-
-                // Клик на всю карточку
                 root.setOnClickListener {
                     onItemClickListener(user)
                 }

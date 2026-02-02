@@ -10,11 +10,13 @@ import ru.netology.nework.api.ApiService
 import ru.netology.nework.dto.Event
 import ru.netology.nework.dto.User
 import ru.netology.nework.error.AppError
+import ru.netology.nework.repository.EventRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class EventDetailViewModel @Inject constructor(
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val eventRepository: EventRepository
 ) : ViewModel() {
 
     private val _event = MutableLiveData<Event?>()
@@ -42,8 +44,6 @@ class EventDetailViewModel @Inject constructor(
                 if (response.isSuccessful) {
                     val event = response.body()
                     _event.value = event
-
-                    // Загружаем спикеров и участников
                     event?.speakerIds?.let { loadSpeakers(it) }
                     event?.participantsIds?.let { loadParticipants(it) }
                 } else {
@@ -66,7 +66,6 @@ class EventDetailViewModel @Inject constructor(
                 _speakers.value = speakerUsers
             }
         } catch (e: Exception) {
-            // Игнорируем ошибку
         }
     }
 
@@ -79,15 +78,16 @@ class EventDetailViewModel @Inject constructor(
                 _participants.value = participantUsers
             }
         } catch (e: Exception) {
-            // Игнорируем ошибку
         }
     }
+
     fun likeEvent(eventId: Long) {
         viewModelScope.launch {
             try {
-                val response = apiService.likeEvent(eventId)
-                if (response.isSuccessful) {
-                    _event.value = response.body()
+                val response = eventRepository.likeById(eventId)
+                if (response != null) {
+                    _event.value = response
+                    loadEvent(eventId)
                 }
             } catch (e: Exception) {
                 _error.value = "Не удалось поставить лайк"
@@ -98,21 +98,28 @@ class EventDetailViewModel @Inject constructor(
     fun participateEvent(eventId: Long) {
         viewModelScope.launch {
             try {
-                // TODO: Нужен endpoint для участия в событии
-                // Пока просто обновляем UI
-                _event.value?.let { currentEvent ->
-                    val newEvent = currentEvent.copy(
-                        participatedByMe = !currentEvent.participatedByMe,
-                        participantsIds = if (currentEvent.participatedByMe) {
-                            currentEvent.participantsIds - 999 // ID текущего пользователя
-                        } else {
-                            currentEvent.participantsIds + 999
-                        }
-                    )
-                    _event.value = newEvent
+                val response = if (_event.value?.participatedByMe == true) {
+                    eventRepository.cancelParticipation(eventId)
+                } else {
+                    eventRepository.participate(eventId)
+                }
+                if (response != null) {
+                    _event.value = response
+                    loadEvent(eventId)
                 }
             } catch (e: Exception) {
                 _error.value = "Не удалось изменить участие"
+            }
+        }
+    }
+
+    fun deleteEvent(eventId: Long) {
+        viewModelScope.launch {
+            try {
+                eventRepository.removeById(eventId)
+                _event.value = null
+            } catch (e: Exception) {
+                _error.value = "Не удалось удалить событие"
             }
         }
     }

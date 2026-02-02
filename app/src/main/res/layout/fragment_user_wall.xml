@@ -36,7 +36,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Шапка с информацией о пользователе -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -76,7 +75,6 @@
                             android:textSize="14sp"
                             android:textColor="?android:attr/textColorSecondary" />
 
-                        <!-- Последнее место работы или "В поиске работы" -->
                         <TextView
                             android:id="@+id/userJob"
                             android:layout_width="wrap_content"
@@ -89,7 +87,6 @@
 
                 </LinearLayout>
 
-                <!-- Список постов -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/postsList"
                     android:layout_width="match_parent"
@@ -97,7 +94,6 @@
                     android:clipToPadding="false"
                     android:padding="8dp" />
 
-                <!-- Сообщение о пустом списке -->
                 <LinearLayout
                     android:id="@+id/emptyState"
                     android:layout_width="match_parent"
@@ -154,7 +150,6 @@
         android:layout_gravity="center"
         android:visibility="gone" />
 
-    <!-- FAB для создания поста -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"

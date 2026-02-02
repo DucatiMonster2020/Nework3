@@ -64,7 +64,6 @@ class MyProfileFragment : Fragment() {
     }
 
     private fun setupTabs() {
-        // Для своего профиля используем isCurrentUser = true
         val userId = appAuth.authState.value?.id ?: 0L
         pagerAdapter = UserProfilePagerAdapter(
             childFragmentManager,
@@ -92,8 +91,6 @@ class MyProfileFragment : Fragment() {
 
         viewModel.loading.observe(viewLifecycleOwner) { loading ->
             binding.progressBar.isVisible = loading
-            // contentContainer в этом макете - это ConstraintLayout
-            // Скрываем/показываем основные элементы
             binding.tabLayout.isVisible = !loading
             binding.viewPager.isVisible = !loading
             binding.userAvatar.isVisible = !loading
@@ -123,11 +120,8 @@ class MyProfileFragment : Fragment() {
 
     private fun updateUserInfo(user: ru.netology.nework.dto.User?) {
         user?.let {
-            // Устанавливаем заголовок тулбара
             (activity as? AppCompatActivity)?.supportActionBar?.title = user.name
             binding.toolbar.subtitle = "@${user.login}"
-
-            // Загружаем аватар
             if (!user.avatar.isNullOrEmpty()) {
                 Glide.with(requireContext())
                     .load(user.avatar)
@@ -138,26 +132,16 @@ class MyProfileFragment : Fragment() {
             } else {
                 binding.userAvatar.setImageResource(R.drawable.author_avatar)
             }
-
-            // Обновляем информацию
             binding.userName.text = user.name
             binding.userLogin.text = "@${user.login}"
         }
     }
-
-    // Для добавления работы (будет вызываться из UserJobsFragment)
     fun navigateToAddJob() {
-        // TODO: Реализовать экран добавления работы
         Snackbar.make(binding.root, "Добавить работу", Snackbar.LENGTH_SHORT).show()
     }
-
-    // Для редактирования работы
     fun navigateToEditJob(jobId: Long) {
-        // TODO: Реализовать экран редактирования работы
         Snackbar.make(binding.root, "Редактировать работу $jobId", Snackbar.LENGTH_SHORT).show()
     }
-
-    // Для удаления работы
     fun deleteJob(jobId: Long) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.delete_job)

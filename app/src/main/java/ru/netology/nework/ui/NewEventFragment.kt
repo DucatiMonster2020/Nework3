@@ -37,10 +37,9 @@ class NewEventFragment : Fragment() {
 
     private var selectedImageUri: Uri? = null
     private var selectedAttachmentUri: Uri? = null
-    private var attachmentType: String? = null // "audio", "video", "image"
+    private var attachmentType: String? = null
     private var eventDate: Date? = null
 
-    // Для выбора изображения
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
@@ -52,8 +51,6 @@ class NewEventFragment : Fragment() {
             binding.removeAttachmentButton.isVisible = true
         }
     }
-
-    // Для выбора видео
     private val pickVideoLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
@@ -64,8 +61,6 @@ class NewEventFragment : Fragment() {
             binding.removeAttachmentButton.isVisible = true
         }
     }
-
-    // Для выбора аудио
     private val pickAudioLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
@@ -116,12 +111,9 @@ class NewEventFragment : Fragment() {
         binding.locationButton.setOnClickListener {
             Snackbar.make(binding.root, "Выбор локации", Snackbar.LENGTH_SHORT).show()
         }
-
-        // Выбор типа события (online/offline)
         binding.eventTypeGroup.setOnCheckedChangeListener { group, checkedId ->
             when (checkedId) {
                 R.id.onlineRadio -> {
-                    // Показываем/скрываем кнопку локации для offline событий
                     binding.locationButton.isVisible = false
                 }
                 R.id.offlineRadio -> {
@@ -130,44 +122,30 @@ class NewEventFragment : Fragment() {
             }
         }
         val isOnline = binding.onlineRadio.isChecked
-
-        // Кнопка выбора даты проведения
         binding.dateButton.setOnClickListener {
             showDateTimePicker()
         }
-
-        // Кнопки выбора изображения
         binding.photoButton.setOnClickListener {
             pickImageLauncher.launch("image/*")
         }
-
         binding.galleryButton.setOnClickListener {
             pickImageLauncher.launch("image/*")
         }
-
-        // Кнопки выбора вложения
         binding.audioButton.setOnClickListener {
             pickAudioLauncher.launch("audio/*")
         }
-
         binding.videoButton.setOnClickListener {
             pickVideoLauncher.launch("video/*")
         }
-
-        // Кнопка выбора спикеров (пока заглушка)
         binding.speakersButton.setOnClickListener {
             Snackbar.make(binding.root, "Выбор спикеров", Snackbar.LENGTH_SHORT).show()
         }
-
-        // Кнопка удаления вложения
         binding.removeAttachmentButton.setOnClickListener {
             selectedAttachmentUri = null
             attachmentType = null
             binding.attachmentType.text = "Вложение не выбрано"
             binding.removeAttachmentButton.isVisible = false
         }
-
-        // Кнопка выбора ссылки
         binding.linkButton.setOnClickListener {
             binding.linkInput.isVisible = !binding.linkInput.isVisible
         }
@@ -187,21 +165,18 @@ class NewEventFragment : Fragment() {
 
         viewModel.success.observe(viewLifecycleOwner) { success ->
             if (success) {
-                // Возвращаемся назад (по ТЗ: "возврат назад к списку событий")
                 findNavController().popBackStack()
             }
         }
     }
 
     private fun showDateTimePicker() {
-        // Сначала выбираем дату
         val datePicker = MaterialDatePicker.Builder.datePicker()
             .setTitleText("Выберите дату")
             .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
             .build()
 
         datePicker.addOnPositiveButtonClickListener { selection ->
-            // Затем выбираем время
             val timePicker = MaterialTimePicker.Builder()
                 .setTimeFormat(TimeFormat.CLOCK_24H)
                 .setTitleText("Выберите время")
@@ -251,10 +226,6 @@ class NewEventFragment : Fragment() {
         } else {
             null
         }
-
-        // Проверка размера вложения (15 МБ по ТЗ)
-        // Пока пропускаем
-
         lifecycleScope.launch {
             viewModel.saveEvent(
                 content = content,

@@ -85,7 +85,6 @@ class UserDetailFragment : Fragment() {
             supportActionBar?.setDisplayShowHomeEnabled(true)
         }
         binding.toolbar.setNavigationOnClickListener {
-            // Навигация назад
             if (!findNavController().popBackStack()) {
                 activity?.onBackPressed()
             }
@@ -93,19 +92,14 @@ class UserDetailFragment : Fragment() {
     }
 
     private fun setupTabs() {
-        // Инициализируем адаптер с правильными параметрами
         pagerAdapter = UserProfilePagerAdapter(
             childFragmentManager,
             lifecycle,
             userId,
             isCurrentUser
         )
-
-        // Настройка ViewPager
         binding.viewPager.adapter = pagerAdapter
         binding.viewPager.offscreenPageLimit = 2
-
-        // Настройка TabLayout с ViewPager
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = when (position) {
                 0 -> getString(R.string.wall_tab)
@@ -113,11 +107,8 @@ class UserDetailFragment : Fragment() {
                 else -> ""
             }
         }.attach()
-
-        // Добавляем слушатель изменения страниц (опционально)
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                // Можно добавить логику при переключении вкладок
             }
         })
     }
@@ -129,8 +120,6 @@ class UserDetailFragment : Fragment() {
 
         viewModel.loading.observe(viewLifecycleOwner) { loading ->
             binding.progressBar.isVisible = loading
-            // contentContainer в этом макете - это ConstraintLayout
-            // Скрываем/показываем основные элементы
             binding.userAvatar.isVisible = !loading
             binding.userName.isVisible = !loading
             binding.userLogin.isVisible = !loading
@@ -155,11 +144,8 @@ class UserDetailFragment : Fragment() {
 
     private fun updateUserInfo(user: User?) {
         user?.let {
-            // Устанавливаем заголовок тулбара
             (activity as? AppCompatActivity)?.supportActionBar?.title = user.name
             binding.toolbar.subtitle = "@${user.login}"
-
-            // Загружаем аватар
             if (!user.avatar.isNullOrEmpty()) {
                 Glide.with(requireContext())
                     .load(user.avatar)
@@ -170,8 +156,6 @@ class UserDetailFragment : Fragment() {
             } else {
                 binding.userAvatar.setImageResource(R.drawable.author_avatar)
             }
-
-            // Обновляем информацию
             binding.userName.text = user.name
             binding.userLogin.text = "@${user.login}"
         }
@@ -179,7 +163,6 @@ class UserDetailFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // При возвращении на фрагмент обновляем данные
         loadUserData()
     }
 

@@ -62,13 +62,12 @@ class EventsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val event = repository.likeById(id)
-                // Обновляем в списке
                 val currentEvents = _dataState.value?.events ?: emptyList()
                 val newEvents = currentEvents.map { if (it.id == id) event else it }
                 _dataState.value = _dataState.value?.copy(events = newEvents)
             } catch (e: Exception) {
                 _state.value = FeedModelState.error("Failed to like event")
-                loadEvents() // Перезагружаем
+                loadEvents()
             }
         }
     }

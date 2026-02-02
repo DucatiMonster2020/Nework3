@@ -45,29 +45,26 @@ class NewEventViewModel @Inject constructor(
                 _error.value = null
                 _success.value = false
 
-                // Форматируем дату для API
                 val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
                 dateFormat.timeZone = TimeZone.getTimeZone("UTC")
                 val datetimeString = dateFormat.format(datetime)
-
-                // Создаем событие
                 val event = Event(
                     id = 0,
-                    author = "", // Заполнится на сервере
-                    authorId = 0, // Заполнится на сервере
+                    author = "",
+                    authorId = 0,
                     authorJob = null,
                     authorAvatar = null,
                     content = content,
                     datetime = datetimeString,
-                    published = "", // Заполнится на сервере
+                    published = "",
                     coords = null,
                     type = if (isOnline) EventType.ONLINE else EventType.OFFLINE,
                     likeOwnerIds = emptyList(),
                     likedByMe = false,
-                    speakerIds = emptyList(), // TODO: добавить спикеров
+                    speakerIds = emptyList(),
                     participantsIds = emptyList(),
                     participatedByMe = false,
-                    attachment = null, // TODO: добавить attachment
+                    attachment = null,
                     link = link,
                     ownedByMe = true
                 )
