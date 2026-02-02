@@ -116,6 +116,7 @@ class EventDetailFragment : Fragment() {
 
         viewModel.loading.observe(viewLifecycleOwner) { loading ->
             binding.progressBar.isVisible = loading
+            // contentContainer заменяем на видимость контейнеров
             binding.contentContainer.isVisible = !loading
         }
 
@@ -136,7 +137,7 @@ class EventDetailFragment : Fragment() {
             }
         }
 
-        // Участие
+        // Участие - по ТЗ кнопка должна быть в детальном просмотре
         binding.participateButton.setOnClickListener {
             viewModel.event.value?.let { event ->
                 viewModel.participateEvent(event.id)
@@ -145,7 +146,9 @@ class EventDetailFragment : Fragment() {
 
         // Меню (только для автора)
         binding.menuButton.setOnClickListener {
-            showEventMenu()
+            viewModel.event.value?.let { event ->
+                showEventMenu(event)
+            }
         }
 
         // Вложение
@@ -194,9 +197,11 @@ class EventDetailFragment : Fragment() {
 
         // Информация об авторе
         binding.authorName.text = event.author
-        binding.publishedTime.text = event.formattedPublished
 
-        // Последнее место работы (ТЗ)
+        // Убрано: publishedTime должно быть "Дата публикации", но в детальном просмотре по ТЗ не требуется
+        // Если элемент есть в макете - скрываем его или не используем
+
+        // Последнее место работы (ТЗ п.1.2: в детальном просмотре)
         binding.authorJob.text = event.authorJob ?: getString(R.string.looking_for_job)
         binding.authorJob.isVisible = true
 
@@ -206,7 +211,7 @@ class EventDetailFragment : Fragment() {
             ru.netology.nework.enumeration.EventType.OFFLINE -> "OFFLINE"
         }
 
-        // Дата и время проведения
+        // Дата и время проведения (ТЗ: в формате dd.mm.yyyy HH:mm)
         binding.eventDateTime.text = event.formattedDateTime
 
         // Контент
@@ -214,16 +219,29 @@ class EventDetailFragment : Fragment() {
 
         // Лайки
         binding.likeCount.text = event.likeOwnerIds.size.toString()
-        binding.likeButton.isChecked = event.likedByMe
+
+        // ИСПРАВЛЕНО: Убрано isChecked, используем иконки
+        val likeIcon = if (event.likedByMe) {
+            R.drawable.ic_like_filled_24
+        } else {
+            R.drawable.ic_like_24
+        }
+        binding.likeButton.setImageResource(likeIcon)
 
         // Участие
-        binding.participantsCount.text = event.participantsIds.size.toString()
-        binding.participateButton.isChecked = event.participatedByMe
+        // УБРАНО: participantsCount - не нужно показывать отдельно, есть список участников
+
+        // ИСПРАВЛЕНО: Убрано isChecked, используем иконки
+        val participateIcon = if (event.participatedByMe) {
+            R.drawable.ic_check
+        } else {
+            R.drawable.ic_check_box_outline
+        }
+        binding.participateButton.setImageResource(participateIcon)
 
         // Вложение
         val hasAttachment = event.attachment != null
         binding.attachmentContainer.isVisible = hasAttachment
-
         if (hasAttachment) {
             event.attachment?.let { attachment ->
                 binding.attachmentType.text = when (attachment.type) {
@@ -238,7 +256,6 @@ class EventDetailFragment : Fragment() {
         // Ссылка
         val hasLink = !event.link.isNullOrEmpty()
         binding.linkContainer.isVisible = hasLink
-
         if (hasLink) {
             binding.linkText.text = event.link
         }
@@ -246,7 +263,6 @@ class EventDetailFragment : Fragment() {
         // Карта (если есть координаты)
         val hasCoords = event.coords != null
         binding.mapContainer.isVisible = hasCoords
-
         if (hasCoords) {
             binding.coordsText.text = "Координаты: ${event.coords?.lat}, ${event.coords?.long}"
         }
@@ -255,7 +271,9 @@ class EventDetailFragment : Fragment() {
         binding.menuButton.isVisible = event.ownedByMe
     }
 
-    private fun showEventMenu() {
+    private fun showEventMenu(event: ru.netology.nework.dto.Event) {
+        // По ТЗ: меню с возможностью удаления или перехода к редактированию
+        // Реализуем через BottomSheet или диалог
         Snackbar.make(binding.root, "Меню события", Snackbar.LENGTH_SHORT).show()
     }
 

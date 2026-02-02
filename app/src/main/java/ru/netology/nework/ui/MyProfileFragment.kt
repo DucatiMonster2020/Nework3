@@ -52,7 +52,6 @@ class MyProfileFragment : Fragment() {
         setupObservers()
         loadProfile()
     }
-
     private fun setupToolbar() {
         (activity as? AppCompatActivity)?.apply {
             setSupportActionBar(binding.toolbar)
@@ -71,7 +70,7 @@ class MyProfileFragment : Fragment() {
             childFragmentManager,
             lifecycle,
             userId,
-            isCurrentUser = true // Важно: свой профиль
+            isCurrentUser = true
         )
 
         binding.viewPager.adapter = pagerAdapter
@@ -93,7 +92,13 @@ class MyProfileFragment : Fragment() {
 
         viewModel.loading.observe(viewLifecycleOwner) { loading ->
             binding.progressBar.isVisible = loading
-            binding.contentContainer.isVisible = !loading
+            // contentContainer в этом макете - это ConstraintLayout
+            // Скрываем/показываем основные элементы
+            binding.tabLayout.isVisible = !loading
+            binding.viewPager.isVisible = !loading
+            binding.userAvatar.isVisible = !loading
+            binding.userName.isVisible = !loading
+            binding.userLogin.isVisible = !loading
         }
 
         viewModel.error.observe(viewLifecycleOwner) { error ->

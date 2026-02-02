@@ -3,28 +3,28 @@
     <string name="app_name">NeWork</string>
 
     <!-- Навигация -->
-    <string name="posts">Posts</string>
-    <string name="events">Events</string>
-    <string name="users">Users</string>
+    <string name="posts">Посты</string>
+    <string name="events">События</string>
+    <string name="users">Пользователи</string>
     <string name="profile">Профиль</string>
 
 
 
     <!-- Сообщения -->
-    <string name="no_posts">No posts yet</string>
-    <string name="no_events">No events yet</string>
-    <string name="no_users">No users yet</string>
-    <string name="create_new_post">Create new post</string>
-    <string name="create_new_event">Create new event</string>
+    <string name="no_posts">Нет постов</string>
+    <string name="no_events">Нет событий</string>
+    <string name="no_users">Нет пользователей</string>
+    <string name="create_new_post">Создать новый пост</string>
+    <string name="create_new_event">Создать новое событие</string>
 
     <!-- Аватары -->
-    <string name="author_avatar">Author avatar</string>
-    <string name="user_avatar">User avatar</string>
+    <string name="author_avatar">Автор аватар</string>
+    <string name="user_avatar">Пользователь аватар</string>
 
     <!-- Общие -->
-    <string name="link">Link</string>
-    <string name="loading">Loading…</string>
-    <string name="error">Error</string>
+    <string name="link">Ссылка</string>
+    <string name="loading">Загрузка...</string>
+    <string name="error">Ошибка</string>
     <string name="retry">Retry</string>
 
     <!-- Авторизация -->
@@ -159,7 +159,7 @@
     <string name="like_post_dialog_header">Войдите и отправляйте реакции!</string>
     <string name="student">Студент</string>
     <string name="don_t_have_an_account_register">Нет аккаунта? Зарегистрируйся</string>
-    <string name="cannot_be_empty">" не может быть пустым"</string>
+    <string name="cannot_be_empty">Не может быть пустым</string>
     <string name="password_and_password_confirmation_must_match">Пароль и подтверждение пароля должны совпадать</string>
     <string name="play">Воспроизвести</string>
     <string name="likers">Нравится</string>
@@ -176,11 +176,10 @@
     <string name="new_post">Новый пост</string>
     <string name="set_placemark">Установить метку</string>
     <string name="replace_attachment">Заменить вложение?</string>
-    <string name="you_have_already_added_an_atatchment">Вы уже добавили вложение. Если вы продолжите, текушее вложение будет удалено. Продолжить?</string>
+    <string name="you_have_already_added_an_attachment">Вы уже добавили вложение. Если вы продолжите, текушее вложение будет удалено. Продолжить?</string>
     <string name="continue_action">Продолжить действие</string>
     <string name="content_can_not_be_empty">Контент не может быть пустым</string>
     <string name="mentioned">Упоминаются</string>
-    <string name="looking_for_a_job">В поиске работы</string>
     <string name="you">Вы</string>
     <string name="choose_users">Выберите пользователей</string>
     <string name="event">Событие</string>

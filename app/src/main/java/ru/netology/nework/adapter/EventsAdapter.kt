@@ -2,6 +2,7 @@ package ru.netology.nework.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -17,7 +18,6 @@ class EventsAdapter(
     private val onLikeClickListener: (Event) -> Unit,
     private val onItemClickListener: (Event) -> Unit = {},
     private val onMenuClickListener: (Event) -> Unit = {},
-    private val onParticipateClickListener: (Event) -> Unit = {},
     private val onAttachmentClickListener: (String) -> Unit = {},
     private val onLinkClickListener: (String) -> Unit = {}
 ) : ListAdapter<Event, EventsAdapter.EventViewHolder>(EventDiffCallback()) {
@@ -33,7 +33,6 @@ class EventsAdapter(
             onLikeClickListener,
             onItemClickListener,
             onMenuClickListener,
-            onParticipateClickListener,
             onAttachmentClickListener,
             onLinkClickListener
         )
@@ -48,7 +47,6 @@ class EventsAdapter(
         private val onLikeClickListener: (Event) -> Unit,
         private val onItemClickListener: (Event) -> Unit,
         private val onMenuClickListener: (Event) -> Unit,
-        private val onParticipateClickListener: (Event) -> Unit,
         private val onAttachmentClickListener: (String) -> Unit,
         private val onLinkClickListener: (String) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
@@ -56,64 +54,55 @@ class EventsAdapter(
         fun bind(event: Event) {
             binding.apply {
                 // Аватар автора
-                if (!event.authorAvatar.isNullOrEmpty()) {
-                    Glide.with(authorAvatar)
-                        .load(event.authorAvatar)
-                        .circleCrop()
-                        .placeholder(R.drawable.author_avatar)
-                        .into(authorAvatar)
-                } else {
+                event.authorAvatar?.let { avatar ->
+                    if (avatar.isNotBlank()) {
+                        Glide.with(authorAvatar)
+                            .load(avatar)
+                            .circleCrop()
+                            .placeholder(R.drawable.author_avatar)
+                            .into(authorAvatar)
+                    } else {
+                        authorAvatar.setImageResource(R.drawable.author_avatar)
+                    }
+                } ?: run {
                     authorAvatar.setImageResource(R.drawable.author_avatar)
                 }
 
-                // Основная информация
+                // Имя автора
                 authorName.text = event.author
+
+                // Дата публикации
                 publishedTime.text = event.formattedPublished
 
-                // Место работы (если есть)
-                if (!event.authorJob.isNullOrEmpty()) {
-                    authorJob.text = event.authorJob
-                    authorJob.isVisible = true
-                } else {
-                    authorJob.isVisible = false
-                }
-
-                // Дата и время проведения
-                eventDateTime.text = event.formattedDateTime
-
-                // Тип события (ONLINE/OFFLINE)
+                // Тип события
                 eventType.text = when (event.type) {
                     EventType.ONLINE -> "ONLINE"
                     EventType.OFFLINE -> "OFFLINE"
                 }
 
-                // Цвет в зависимости от типа
-                eventType.setBackgroundResource(
-                    when (event.type) {
-                        EventType.ONLINE -> R.color.event_online
-                        EventType.OFFLINE -> R.color.event_offline
-                    }
+                // Цвет типа события
+                val typeColor = when (event.type) {
+                    EventType.ONLINE -> R.color.event_online
+                    EventType.OFFLINE -> R.color.event_offline
+                }
+                eventType.setBackgroundColor(
+                    ContextCompat.getColor(itemView.context, typeColor)
                 )
 
-                // Контент события
+                // Дата проведения (ТЗ: отдельное поле в карточке)
+                eventDateTime.text = event.formattedDateTime
+
+                // Контент
                 content.text = event.content
 
                 // Лайки
                 likeCount.text = event.likeOwnerIds.size.toString()
-                likeButton.isChecked = event.likedByMe
-
-                // Участие
-                participantsCount.text = event.participantsIds.size.toString()
-                participateButton.isChecked = event.participatedByMe
-                val participateIcon = if (event.participatedByMe) {
-                    R.drawable.ic_check
+                val likeIcon = if (event.likedByMe) {
+                    R.drawable.ic_like_filled_24
                 } else {
-                    R.drawable.ic_check_box_outline
+                    R.drawable.ic_like_24
                 }
-                participateButton.setIconResource(participateIcon)
-
-                // Спикеры
-                speakersCount.text = event.speakerIds.size.toString()
+                likeButton.setImageResource(likeIcon)
 
                 // Вложение
                 val hasAttachment = event.attachment != null
@@ -140,68 +129,43 @@ class EventsAdapter(
                 }
 
                 // Ссылка
-                val hasLink = !event.link.isNullOrEmpty()
+                val hasLink = !event.link.isNullOrBlank()
                 linkContainer.isVisible = hasLink
-
                 if (hasLink) {
-                    event.link?.let { link ->
-                        linkText.text = link
-                    }
+                    linkText.text = event.link
                 }
 
-                // Кнопка меню (видна только автору)
+                // Кнопка меню (только для автора)
                 menuButton.isVisible = event.ownedByMe
 
-                // ========== ОБРАБОТЧИКИ КЛИКОВ ==========
+                // ========== ОБРАБОТЧИКИ ==========
+                likeButton.setOnClickListener { onLikeClickListener(event) }
+                menuButton.setOnClickListener { onMenuClickListener(event) }
 
-                // Лайк
-                likeButton.setOnClickListener {
-                    onLikeClickListener(event)
-                }
-
-                // Участие
-                participateButton.setOnClickListener {
-                    onParticipateClickListener(event)
-                }
-
-                // Меню
-                menuButton.setOnClickListener {
-                    onMenuClickListener(event)
-                }
-
-                // Вложение
                 if (hasAttachment) {
                     attachmentContainer.setOnClickListener {
-                        event.attachment?.url?.let { url ->
-                            onAttachmentClickListener(url)
-                        }
+                        event.attachment?.url?.let { url -> onAttachmentClickListener(url) }
                     }
                 }
 
-                // Ссылка
                 if (hasLink) {
                     linkContainer.setOnClickListener {
-                        event.link?.let { link ->
-                            onLinkClickListener(link)
-                        }
+                        event.link?.let { link -> onLinkClickListener(link) }
                     }
                 }
 
-                // Вся карточка
-                root.setOnClickListener {
-                    onItemClickListener(event)
-                }
+                root.setOnClickListener { onItemClickListener(event) }
             }
         }
     }
-}
 
-class EventDiffCallback : DiffUtil.ItemCallback<Event>() {
-    override fun areItemsTheSame(oldItem: Event, newItem: Event): Boolean {
-        return oldItem.id == newItem.id
-    }
+    class EventDiffCallback : DiffUtil.ItemCallback<Event>() {
+        override fun areItemsTheSame(oldItem: Event, newItem: Event): Boolean {
+            return oldItem.id == newItem.id
+        }
 
-    override fun areContentsTheSame(oldItem: Event, newItem: Event): Boolean {
-        return oldItem == newItem
+        override fun areContentsTheSame(oldItem: Event, newItem: Event): Boolean {
+            return oldItem == newItem
+        }
     }
 }

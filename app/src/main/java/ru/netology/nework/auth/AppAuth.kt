@@ -29,7 +29,6 @@ class AppAuth(private val context: Context) {
     data class AuthState(val id: Long = 0, val token: String? = null)
 
     private fun saveToken(token: Token) {
-        // Простое хранение в SharedPreferences
         context.getSharedPreferences("auth", Context.MODE_PRIVATE).edit {
             putString("token", token.token)
             putLong("id", token.id)
@@ -51,6 +50,7 @@ class AppAuth(private val context: Context) {
         val prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
         val token = prefs.getString("token", null)
         val id = prefs.getLong("id", 0L)
+        val avatar = prefs.getString("avatar", null)
 
         if (token != null && id != 0L) {
             _authStateFlow.value = AuthState(id = id, token = token)

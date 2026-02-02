@@ -50,61 +50,53 @@ class PostsAdapter(
 
         fun bind(post: Post) {
             binding.apply {
+                // ========== ОСНОВНАЯ ИНФОРМАЦИЯ ==========
+
                 // Аватар автора
                 if (!post.authorAvatar.isNullOrEmpty()) {
                     Glide.with(authorAvatar)
                         .load(post.authorAvatar)
                         .circleCrop()
-                        .placeholder(android.R.drawable.ic_menu_gallery)
+                        .placeholder(R.drawable.author_avatar)
                         .into(authorAvatar)
                 } else {
-                    authorAvatar.setImageResource(android.R.drawable.ic_menu_gallery)
+                    authorAvatar.setImageResource(R.drawable.author_avatar)
                 }
 
-                // Основная информация
+                // Имя автора и дата публикации
                 authorName.text = post.author
                 publishedTime.text = post.formattedDate
-
-                // Место работы (если есть)
-                if (!post.authorJob.isNullOrEmpty()) {
-                    authorJob.text = post.authorJob
-                    authorJob.isVisible = true
-                } else {
-                    authorJob.isVisible = false
-                }
 
                 // Контент поста
                 content.text = post.content
 
-                // Лайки
+                // ========== ЛАЙКИ ==========
                 likeCount.text = post.likeOwnerIds.size.toString()
-                likeButton.isChecked = post.likedByMe
-
-                // Иконка лайка в зависимости от состояния
                 val likeIcon = if (post.likedByMe) {
                     R.drawable.ic_like_filled_24
                 } else {
                     R.drawable.ic_like_24
                 }
-                likeButton.setIconResource(likeIcon)
+                likeButton.setImageResource(likeIcon)
 
-                // Вложение (аудио, видео, фото)
+                // ========== ВЛОЖЕНИЕ ==========
                 val hasAttachment = post.attachment != null
                 attachmentContainer.isVisible = hasAttachment
 
                 if (hasAttachment) {
                     post.attachment?.let { attachment ->
+                        // Иконка в зависимости от типа
                         when (attachment.type) {
                             AttachmentType.IMAGE -> {
-                                attachmentIcon.setImageResource(android.R.drawable.ic_menu_gallery)
+                                attachmentIcon.setImageResource(R.drawable.ic_image)
                                 attachmentType.text = "Фото"
                             }
                             AttachmentType.VIDEO -> {
-                                attachmentIcon.setImageResource(android.R.drawable.ic_media_play)
+                                attachmentIcon.setImageResource(R.drawable.ic_video)
                                 attachmentType.text = "Видео"
                             }
                             AttachmentType.AUDIO -> {
-                                attachmentIcon.setImageResource(android.R.drawable.ic_btn_speak_now)
+                                attachmentIcon.setImageResource(R.drawable.ic_audio)
                                 attachmentType.text = "Аудио"
                             }
                         }
@@ -112,27 +104,16 @@ class PostsAdapter(
                     }
                 }
 
-                // Ссылка
+                // ========== ССЫЛКА ==========
                 val hasLink = !post.link.isNullOrEmpty()
                 linkContainer.isVisible = hasLink
 
                 if (hasLink) {
-                    post.link?.let { link ->
-                        linkText.text = link
-                    }
+                    linkText.text = post.link
                 }
 
-                // Кнопка меню (видна только автору)
+                // ========== МЕНЮ (только для автора) ==========
                 menuButton.isVisible = post.ownedByMe
-
-                // Упомянутые пользователи (если есть)
-                val hasMentions = !post.mentionIds.isNullOrEmpty()
-                mentionsContainer.isVisible = hasMentions
-
-                if (hasMentions && post.mentionIds != null) {
-                    mentionsCount.text = "Упомянуто: ${post.mentionIds.size} чел."
-                    mentionsMeIndicator.isVisible = post.mentionedMe
-                }
 
                 // ========== ОБРАБОТЧИКИ КЛИКОВ ==========
 
@@ -168,22 +149,17 @@ class PostsAdapter(
                 root.setOnClickListener {
                     onItemClickListener(post)
                 }
-
-                // Переменные для передачи данных в обработчики
-                root.tag = post
-                attachmentContainer.tag = post.attachment?.url
-                linkContainer.tag = post.link
             }
         }
     }
-}
 
-class PostDiffCallback : DiffUtil.ItemCallback<Post>() {
-    override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
-        return oldItem.id == newItem.id
-    }
+    class PostDiffCallback : DiffUtil.ItemCallback<Post>() {
+        override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
+            return oldItem.id == newItem.id
+        }
 
-    override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean {
-        return oldItem == newItem
+        override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean {
+            return oldItem == newItem
+        }
     }
 }

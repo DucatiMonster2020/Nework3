@@ -3,18 +3,23 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/primary"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="?attr/homeAsUpIndicator" />
+            app:navigationIcon="?attr/homeAsUpIndicator"
+            app:titleTextColor="@android:color/white"
+            app:subtitleTextColor="@android:color/white"
+            app:navigationIconTint="@android:color/white" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -22,8 +27,7 @@
         android:id="@+id/contentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:visibility="gone">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -31,17 +35,55 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- Заголовок события -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="24dp">
+
+                <!-- Тип события -->
+                <TextView
+                    android:id="@+id/eventType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/event_type_background"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp"
+                    android:text="ONLINE"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Дата и время события -->
+                <TextView
+                    android:id="@+id/eventDateTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="28.08.22 19:00"
+                    android:textColor="@color/on_surface"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+            </LinearLayout>
+
             <!-- Информация об авторе -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="24dp"
+                android:background="?attr/selectableItemBackground"
+                android:padding="12dp"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:id="@+id/authorAvatar"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_marginEnd="16dp"
                     android:contentDescription="@string/author_avatar" />
 
@@ -55,64 +97,22 @@
                         android:id="@+id/authorName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/publishedTime"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textSize="14sp"
-                        android:textColor="?android:attr/textColorSecondary" />
+                        android:text="Adison Levin"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/on_surface" />
 
                     <!-- Последнее место работы (ТЗ) -->
                     <TextView
                         android:id="@+id/authorJob"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="4dp"
+                        android:text="iOS Developer"
                         android:textSize="14sp"
-                        android:textColor="?android:attr/textColorSecondary" />
+                        android:textColor="@color/on_surface_variant" />
 
                 </LinearLayout>
-
-                <!-- Кнопка меню -->
-                <ImageButton
-                    android:id="@+id/menuButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_more_vert_24"
-                    android:background="?attr/selectableItemBackground"
-                    android:contentDescription="@string/event_menu"
-                    android:visibility="gone" />
-
-            </LinearLayout>
-
-            <!-- Тип и дата события -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
-
-                <TextView
-                    android:id="@+id/eventType"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp"
-                    android:textColor="@android:color/white"
-                    android:background="@color/colorPrimary" />
-
-                <TextView
-                    android:id="@+id/eventDateTime"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:textSize="14sp"
-                    android:textColor="?android:attr/textColorSecondary" />
 
             </LinearLayout>
 
@@ -121,8 +121,10 @@
                 android:id="@+id/content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="24dp"
+                android:text="Текст события..."
                 android:textSize="16sp"
+                android:textColor="@color/on_surface"
                 android:lineSpacingExtra="4dp" />
 
             <!-- Вложение -->
@@ -132,7 +134,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="12dp"
-                android:background="?attr/colorSurfaceVariant"
+                android:background="?attr/selectableItemBackground"
                 android:layout_marginBottom="16dp"
                 android:visibility="gone">
 
@@ -140,7 +142,8 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_attachment_24"
-                    android:layout_marginEnd="12dp" />
+                    android:layout_marginEnd="12dp"
+                    app:tint="@color/primary" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -152,7 +155,8 @@
                         android:id="@+id/attachmentType"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:textColor="@color/on_surface" />
 
                     <TextView
                         android:id="@+id/attachmentUrl"
@@ -160,7 +164,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:textSize="12sp"
-                        android:textColor="?android:attr/textColorSecondary" />
+                        android:textColor="@color/on_surface_variant" />
 
                 </LinearLayout>
 
@@ -173,7 +177,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="12dp"
-                android:background="?attr/colorSurfaceVariant"
+                android:background="?attr/selectableItemBackground"
                 android:layout_marginBottom="16dp"
                 android:visibility="gone">
 
@@ -181,94 +185,134 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_link_24"
-                    android:layout_marginEnd="12dp" />
+                    android:layout_marginEnd="12dp"
+                    app:tint="@color/primary" />
 
                 <TextView
                     android:id="@+id/linkText"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textColor="@color/colorPrimary" />
+                    android:textColor="@color/primary" />
 
             </LinearLayout>
 
-            <!-- Лайки и участие -->
+            <!-- Действия -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="32dp"
+                android:gravity="center_vertical">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/likeButton"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                <!-- Лайки -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/ic_like_24"
-                    android:drawablePadding="4dp" />
+                    android:orientation="horizontal"
+                    android:layout_marginEnd="24dp">
 
-                <TextView
-                    android:id="@+id/likeCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="8dp" />
+                    <ImageButton
+                        android:id="@+id/likeButton"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:contentDescription="@string/like"
+                        app:srcCompat="@drawable/ic_like_24"
+                        app:tint="@color/on_surface_variant" />
 
+                    <TextView
+                        android:id="@+id/likeCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:gravity="center_vertical"
+                        android:text="10"
+                        android:textColor="@color/on_surface"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <!-- Участие -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/participateButton"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
+                    android:text="@string/participate"
                     android:drawableStart="@drawable/ic_check"
                     android:drawablePadding="4dp" />
 
-                <TextView
-                    android:id="@+id/participantsCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="8dp" />
-
             </LinearLayout>
+
+            <!-- Разделитель -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/on_surface_variant"
+                android:alpha="0.12"
+                android:layout_marginBottom="24dp" />
 
             <!-- Спикеры (ТЗ) -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/speakers"
+                android:textSize="18sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+                android:textColor="@color/on_surface"
+                android:layout_marginBottom="16dp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/speakersList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="32dp"
+                android:nestedScrollingEnabled="false" />
+
+            <!-- Разделитель -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/on_surface_variant"
+                android:alpha="0.12"
+                android:layout_marginBottom="24dp" />
 
             <!-- Участники (ТЗ) -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/participants"
+                android:textSize="18sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+                android:textColor="@color/on_surface"
+                android:layout_marginBottom="16dp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/participantsList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="32dp"
+                android:nestedScrollingEnabled="false" />
 
-            <!-- Карта (ТЗ) -->
+            <!-- Карта (ТЗ) - только для offline событий -->
             <LinearLayout
                 android:id="@+id/mapContainer"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="240dp"
                 android:orientation="vertical"
-                android:background="?attr/colorSurfaceVariant"
+                android:background="@color/surface_variant"
                 android:layout_marginBottom="16dp"
                 android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/map"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/on_surface"
+                    android:layout_margin="16dp" />
 
                 <ImageView
                     android:layout_width="match_parent"
@@ -281,11 +325,15 @@
                     android:id="@+id/coordsText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_margin="8dp"
+                    android:layout_gravity="center|bottom"
+                    android:layout_margin="16dp"
                     android:background="@android:color/white"
-                    android:padding="8dp"
-                    android:textSize="12sp" />
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="8dp"
+                    android:text="55.7558, 37.6176"
+                    android:textSize="12sp"
+                    android:textColor="@color/on_surface"
+                    android:elevation="4dp" />
 
             </LinearLayout>
 

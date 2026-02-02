@@ -114,7 +114,7 @@ class UserDetailFragment : Fragment() {
             }
         }.attach()
 
-// Добавляем слушатель изменения страниц (опционально)
+        // Добавляем слушатель изменения страниц (опционально)
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 // Можно добавить логику при переключении вкладок
@@ -129,7 +129,13 @@ class UserDetailFragment : Fragment() {
 
         viewModel.loading.observe(viewLifecycleOwner) { loading ->
             binding.progressBar.isVisible = loading
-            binding.contentContainer.isVisible = !loading
+            // contentContainer в этом макете - это ConstraintLayout
+            // Скрываем/показываем основные элементы
+            binding.userAvatar.isVisible = !loading
+            binding.userName.isVisible = !loading
+            binding.userLogin.isVisible = !loading
+            binding.tabLayout.isVisible = !loading
+            binding.viewPager.isVisible = !loading
         }
 
         viewModel.error.observe(viewLifecycleOwner) { error ->

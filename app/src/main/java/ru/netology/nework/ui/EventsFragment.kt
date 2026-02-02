@@ -7,9 +7,11 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import ru.netology.nework.R
 import ru.netology.nework.adapter.EventsAdapter
 import ru.netology.nework.auth.AuthStateManager
 import ru.netology.nework.databinding.FragmentEventsBinding
@@ -28,22 +30,22 @@ class EventsFragment : Fragment() {
                 viewModel.likeById(event.id)
             },
             onItemClickListener = { event ->
-                showSnackbar("Clicked event: ${event.id}")
-                // TODO: переход к деталям события
+                // Переход к деталям события
+                findNavController().navigate(
+                    R.id.action_eventsFragment_to_eventDetailFragment,
+                    Bundle().apply {
+                        putLong("eventId", event.id)
+                    }
+                )
             },
             onMenuClickListener = { event ->
                 showEventMenu(event)
             },
-            onParticipateClickListener = { event ->
-                viewModel.participateById(event.id)
-            },
             onAttachmentClickListener = { url ->
                 showSnackbar("Attachment: $url")
-                // TODO: открыть вложение
             },
             onLinkClickListener = { url ->
                 showSnackbar("Link: $url")
-                // TODO: открыть в браузере
             }
         )
     }
@@ -111,19 +113,21 @@ class EventsFragment : Fragment() {
         binding.fab.setOnClickListener {
             val isAuthorized = AuthStateManager.authState.value is AuthStateManager.AuthState.Authorized
             if (isAuthorized) {
-                showSnackbar("Create new event")
+                // Переход к созданию события
+                findNavController().navigate(R.id.action_eventsFragment_to_newEventFragment)
             } else {
                 showLoginRequiredDialog()
             }
         }
     }
+
     private fun showLoginRequiredDialog() {
         showSnackbar("Please sign in to create new event")
     }
 
     private fun showEventMenu(event: ru.netology.nework.dto.Event) {
-        // TODO: показать диалог с опциями удалить/редактировать
-        showSnackbar("Menu for event ${event.id}")
+        // По ТЗ: меню для автора с удалением/редактированием
+        Snackbar.make(binding.root, "Menu for event ${event.id}", Snackbar.LENGTH_SHORT).show()
     }
 
     private fun showError(message: String?) {

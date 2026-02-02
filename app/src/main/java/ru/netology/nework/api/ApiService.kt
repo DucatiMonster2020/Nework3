@@ -24,12 +24,9 @@ import ru.netology.nework.dto.User
 interface ApiService {
 
     // ========== POSTS ==========
-
-    // Основной метод для получения всех постов (ЕСТЬ в Swagger!)
     @GET("api/posts")
     suspend fun getAllPosts(): Response<List<Post>>
 
-    // Пагинация (у вас уже есть)
     @GET("api/posts/latest")
     suspend fun getLatestPosts(@Query("count") count: Int): Response<List<Post>>
 
@@ -61,12 +58,9 @@ interface ApiService {
     suspend fun dislikePost(@Path("id") id: Long): Response<Post>
 
     // ========== EVENTS ==========
-
-    // Основной метод для получения всех событий (ЕСТЬ в Swagger!)
     @GET("api/events")
     suspend fun getAllEvents(): Response<List<Event>>
 
-    // Пагинация (у вас уже есть)
     @GET("api/events/latest")
     suspend fun getLatestEvents(@Query("count") count: Int): Response<List<Event>>
 
@@ -97,37 +91,38 @@ interface ApiService {
     @DELETE("api/events/{id}/likes")
     suspend fun dislikeEvent(@Path("id") id: Long): Response<Event>
 
-    // ========== USERS ==========
+    @POST("api/events/{id}/participants")
+    suspend fun participateEvent(@Path("id") id: Long): Response<Event>
 
+    @DELETE("api/events/{id}/participants")
+    suspend fun cancelParticipation(@Path("id") id: Long): Response<Event>
+
+    // ========== USERS ==========
     @GET("api/users")
     suspend fun getAllUsers(): Response<List<User>>
 
     @GET("api/users/{id}")
     suspend fun getUserById(@Path("id") id: Long): Response<User>
 
-    // Обратите внимание: в Swagger параметр называется "pass", не "password"
-    @Multipart
-    @POST("api/users/registration")
-    suspend fun registerUser(
-        @Part("login") login: RequestBody,
-        @Part("pass") pass: RequestBody,  // "pass", не "password"!
-        @Part("name") name: RequestBody,
-        @Part file: MultipartBody.Part? = null
-    ): Response<Token>
-
-    // Здесь тоже "pass", не "password"
     @FormUrlEncoded
     @POST("api/users/authentication")
     suspend fun authenticateUser(
         @Field("login") login: String,
-        @Field("pass") pass: String  // "pass", не "password"!
+        @Field("pass") pass: String
+    ): Response<Token>
+    @Multipart
+    @POST("api/users/registration")
+    suspend fun registerUser(
+        @Part("login") login: RequestBody,
+        @Part("pass") pass: RequestBody,
+        @Part("name") name: RequestBody,
+        @Part file: MultipartBody.Part? = null
     ): Response<Token>
 
     @POST("api/users/push-tokens")
     suspend fun savePushToken(@Body token: PushToken): Response<Unit>
 
     // ========== JOBS ==========
-
     @GET("api/my/jobs")
     suspend fun getMyJobs(): Response<List<Job>>
 
@@ -141,13 +136,11 @@ interface ApiService {
     suspend fun deleteJob(@Path("id") id: Long): Response<Unit>
 
     // ========== MEDIA ==========
-
     @Multipart
     @POST("api/media")
     suspend fun upload(@Part file: MultipartBody.Part): Response<Media>
 
     // ========== WALL ==========
-
     @GET("api/{authorId}/wall")
     suspend fun getUserWall(@Path("authorId") authorId: Long): Response<List<Post>>
 }

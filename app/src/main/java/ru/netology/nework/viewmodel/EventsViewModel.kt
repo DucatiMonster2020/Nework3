@@ -61,34 +61,27 @@ class EventsViewModel @Inject constructor(
     fun likeById(id: Long) {
         viewModelScope.launch {
             try {
-                // Оптимистичное обновление
+                val event = repository.likeById(id)
+                // Обновляем в списке
                 val currentEvents = _dataState.value?.events ?: emptyList()
-                val event = currentEvents.find { it.id == id }
-                event?.let { originalEvent ->
-                    val updatedEvent = originalEvent.copy(
-                        likedByMe = !originalEvent.likedByMe,
-                        likeOwnerIds = if (originalEvent.likedByMe) {
-                            originalEvent.likeOwnerIds - 999
-                        } else {
-                            originalEvent.likeOwnerIds + 999
-                        }
-                    )
-
-                    val newEvents = currentEvents.map {
-                        if (it.id == id) updatedEvent else it
-                    }
-
-                    _dataState.value = _dataState.value?.copy(events = newEvents)
-
-                    // TODO: Отправляем запрос на сервер
-                    // if (updatedEvent.likedByMe) {
-                    //     repository.likeById(id)
-                    // } else {
-                    //     repository.dislikeById(id)
-                    // }
-                }
+                val newEvents = currentEvents.map { if (it.id == id) event else it }
+                _dataState.value = _dataState.value?.copy(events = newEvents)
             } catch (e: Exception) {
                 _state.value = FeedModelState.error("Failed to like event")
+                loadEvents() // Перезагружаем
+            }
+        }
+    }
+
+    fun dislikeById(id: Long) {
+        viewModelScope.launch {
+            try {
+                val event = repository.dislikeById(id)
+                val currentEvents = _dataState.value?.events ?: emptyList()
+                val newEvents = currentEvents.map { if (it.id == id) event else it }
+                _dataState.value = _dataState.value?.copy(events = newEvents)
+            } catch (e: Exception) {
+                _state.value = FeedModelState.error("Failed to dislike event")
                 loadEvents()
             }
         }
@@ -97,34 +90,26 @@ class EventsViewModel @Inject constructor(
     fun participateById(id: Long) {
         viewModelScope.launch {
             try {
-                // Оптимистичное обновление
+                val event = repository.participate(id)
                 val currentEvents = _dataState.value?.events ?: emptyList()
-                val event = currentEvents.find { it.id == id }
-                event?.let { originalEvent ->
-                    val updatedEvent = originalEvent.copy(
-                        participatedByMe = !originalEvent.participatedByMe,
-                        participantsIds = if (originalEvent.participatedByMe) {
-                            originalEvent.participantsIds - 999
-                        } else {
-                            originalEvent.participantsIds + 999
-                        }
-                    )
-
-                    val newEvents = currentEvents.map {
-                        if (it.id == id) updatedEvent else it
-                    }
-
-                    _dataState.value = _dataState.value?.copy(events = newEvents)
-
-                    // TODO: Отправляем запрос на сервер
-                    // if (updatedEvent.participatedByMe) {
-                    //     repository.participate(id)
-                    // } else {
-                    //     repository.cancelParticipation(id)
-                    // }
-                }
+                val newEvents = currentEvents.map { if (it.id == id) event else it }
+                _dataState.value = _dataState.value?.copy(events = newEvents)
             } catch (e: Exception) {
                 _state.value = FeedModelState.error("Failed to participate")
+                loadEvents()
+            }
+        }
+    }
+
+    fun cancelParticipationById(id: Long) {
+        viewModelScope.launch {
+            try {
+                val event = repository.cancelParticipation(id)
+                val currentEvents = _dataState.value?.events ?: emptyList()
+                val newEvents = currentEvents.map { if (it.id == id) event else it }
+                _dataState.value = _dataState.value?.copy(events = newEvents)
+            } catch (e: Exception) {
+                _state.value = FeedModelState.error("Failed to cancel participation")
                 loadEvents()
             }
         }
@@ -133,12 +118,10 @@ class EventsViewModel @Inject constructor(
     fun removeById(id: Long) {
         viewModelScope.launch {
             try {
+                repository.removeById(id)
                 val currentEvents = _dataState.value?.events ?: emptyList()
                 val newEvents = currentEvents.filter { it.id != id }
                 _dataState.value = _dataState.value?.copy(events = newEvents)
-
-                // TODO: Отправляем запрос на сервер
-                // repository.removeById(id)
             } catch (e: Exception) {
                 _state.value = FeedModelState.error("Failed to delete event")
                 loadEvents()

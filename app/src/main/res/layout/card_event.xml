@@ -6,62 +6,53 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="8dp"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardCornerRadius="12dp"
     app:cardElevation="2dp"
-    android:foreground="?attr/selectableItemBackground">
+    app:cardUseCompatPadding="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- Заголовок с аватаром -->
+        <!-- Аватар автора -->
         <ImageView
             android:id="@+id/authorAvatar"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:contentDescription="@string/author_avatar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Имя автора -->
         <TextView
             android:id="@+id/authorName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:text="Имя автора"
+            android:text=""
             android:textSize="16sp"
             android:textStyle="bold"
+            android:textColor="@color/on_surface"
             app:layout_constraintEnd_toStartOf="@id/menuButton"
             app:layout_constraintStart_toEndOf="@id/authorAvatar"
             app:layout_constraintTop_toTopOf="@id/authorAvatar" />
 
+        <!-- Дата публикации -->
         <TextView
             android:id="@+id/publishedTime"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="01.01.2023 12:00"
-            android:textColor="?android:attr/textColorSecondary"
+            android:layout_marginTop="2dp"
+            android:text=""
+            android:textColor="@color/on_surface_variant"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="@id/authorName"
             app:layout_constraintStart_toStartOf="@id/authorName"
             app:layout_constraintTop_toBottomOf="@id/authorName" />
 
-        <!-- Место работы автора -->
-        <TextView
-            android:id="@+id/authorJob"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="Android Developer"
-            android:textColor="@color/black"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="@id/authorName"
-            app:layout_constraintStart_toStartOf="@id/authorName"
-            app:layout_constraintTop_toBottomOf="@id/publishedTime" />
-
-        <!-- Кнопка меню -->
+        <!-- Кнопка меню (только для автора) -->
         <ImageButton
             android:id="@+id/menuButton"
             android:layout_width="24dp"
@@ -71,31 +62,33 @@
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_more_vert_24" />
+            app:srcCompat="@drawable/ic_more_vert_24"
+            app:tint="@color/on_surface_variant" />
 
-        <!-- Тип события и дата проведения -->
+        <!-- Тип события -->
         <TextView
             android:id="@+id/eventType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:backgroundTint="@color/event_online"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/event_type_background"
             android:paddingHorizontal="8dp"
             android:paddingVertical="4dp"
-            android:text="ONLINE"
-            android:textColor="@color/white"
+            android:text=""
+            android:textColor="@android:color/white"
             android:textSize="12sp"
             android:textStyle="bold"
-            app:backgroundTint="@color/event_online"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/authorAvatar" />
 
+        <!-- Дата проведения (ТЗ: отдельное поле) -->
         <TextView
             android:id="@+id/eventDateTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="01.01.2023 14:00"
+            android:text=""
+            android:textColor="@color/on_surface_variant"
             android:textSize="12sp"
             app:layout_constraintBaseline_toBaselineOf="@id/eventType"
             app:layout_constraintStart_toEndOf="@id/eventType" />
@@ -105,14 +98,18 @@
             android:id="@+id/content"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Текст события..."
+            android:layout_marginTop="12dp"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:text=""
+            android:textColor="@color/on_surface"
             android:textSize="14sp"
+            android:lineSpacingExtra="2dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/eventType" />
 
-        <!-- Контейнер для вложения -->
+        <!-- Вложение -->
         <LinearLayout
             android:id="@+id/attachmentContainer"
             android:layout_width="0dp"
@@ -133,7 +130,8 @@
                 android:layout_height="24dp"
                 android:layout_marginEnd="8dp"
                 android:contentDescription="@string/attachment"
-                app:srcCompat="@drawable/ic_attachment_24" />
+                app:srcCompat="@drawable/ic_attachment_24"
+                app:tint="@color/primary" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -145,7 +143,8 @@
                     android:id="@+id/attachmentType"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Вложение"
+                    android:text=""
+                    android:textColor="@color/on_surface"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
@@ -155,14 +154,15 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="example.com/file.jpg"
+                    android:text=""
+                    android:textColor="@color/on_surface_variant"
                     android:textSize="10sp" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <!-- Контейнер для ссылки -->
+        <!-- Ссылка -->
         <LinearLayout
             android:id="@+id/linkContainer"
             android:layout_width="0dp"
@@ -182,7 +182,8 @@
                 android:layout_height="24dp"
                 android:layout_marginEnd="8dp"
                 android:contentDescription="@string/link"
-                app:srcCompat="@drawable/ic_link_24" />
+                app:srcCompat="@drawable/ic_link_24"
+                app:tint="@color/primary" />
 
             <TextView
                 android:id="@+id/linkText"
@@ -191,119 +192,42 @@
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="https://example.com"
+                android:text=""
+                android:textColor="@color/primary"
                 android:textSize="12sp" />
 
         </LinearLayout>
-        <!-- Статистика события -->
+
+        <!-- Лайки -->
         <LinearLayout
-            android:id="@+id/statsContainer"
+            android:id="@+id/likesContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             android:orientation="horizontal"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/linkContainer">
 
-            <!-- Участники -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginEnd="4dp"
-                    android:src="@drawable/ic_baseline_people_24"
-                    android:contentDescription="@string/participants" />
-
-                <TextView
-                    android:id="@+id/participantsCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textSize="12sp" />
-
-            </LinearLayout>
-
-            <!-- Спикеры -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginEnd="4dp"
-                    android:src="@drawable/ic_mic_24"
-                    android:contentDescription="@string/speakers" />
-
-                <TextView
-                    android:id="@+id/speakersCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textSize="12sp" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <!-- Действия -->
-        <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/actionsContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/statsContainer">
-
-            <!-- Лайк -->
-            <com.google.android.material.button.MaterialButton
+            <ImageButton
                 android:id="@+id/likeButton"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:insetBottom="0dp"
-                android:insetTop="0dp"
-                app:icon="@drawable/ic_like_24"
-                app:iconTint="?attr/colorPrimary" />
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/like"
+                app:srcCompat="@drawable/ic_like_24"
+                app:tint="@color/on_surface_variant" />
 
             <TextView
                 android:id="@+id/likeCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
                 android:gravity="center_vertical"
-                android:paddingStart="8dp"
-                android:paddingEnd="16dp"
                 android:text="0"
-                android:textSize="14sp" />
+                android:textColor="@color/on_surface_variant"
+                android:textSize="12sp" />
 
-            <!-- Участие -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/participateButton"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:insetBottom="0dp"
-                android:insetTop="0dp"
-                app:icon="@drawable/ic_check_circle"
-                app:iconTint="?attr/colorPrimary" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:paddingStart="8dp"
-                android:text="@string/participate"
-                android:textSize="14sp" />
-
-        </com.google.android.material.button.MaterialButtonToggleGroup>
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
