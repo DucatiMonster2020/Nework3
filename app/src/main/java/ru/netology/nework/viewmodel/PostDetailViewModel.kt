@@ -9,8 +9,11 @@ import kotlinx.coroutines.launch
 import ru.netology.nework.api.ApiService
 import ru.netology.nework.dto.Post
 import ru.netology.nework.dto.User
+import ru.netology.nework.error.ApiError
 import ru.netology.nework.error.AppError
 import ru.netology.nework.repository.PostRepository
+import ru.netology.nework.utils.Constants
+import ru.netology.nework.utils.SingleLiveEvent
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,8 +31,8 @@ class PostDetailViewModel @Inject constructor(
     private val _loading = MutableLiveData(false)
     val loading: LiveData<Boolean> = _loading
 
-    private val _error = MutableLiveData<String?>()
-    val error: LiveData<String?> = _error
+    private val _error = SingleLiveEvent<AppError?>()
+    val error: LiveData<AppError?> = _error
 
     fun loadPost(postId: Long) {
         viewModelScope.launch {
@@ -43,10 +46,10 @@ class PostDetailViewModel @Inject constructor(
                     _post.value = post
                     post?.mentionIds?.let { loadMentionedUsers(it) }
                 } else {
-                    _error.value = "Не удалось загрузить пост"
+                    _error.value = ApiError(Constants.ERROR_LOAD_POST)
                 }
             } catch (e: Exception) {
-                _error.value = AppError.fromThrowable(e).message
+                _error.value = AppError.fromThrowable(e)
             } finally {
                 _loading.value = false
             }
@@ -73,7 +76,7 @@ class PostDetailViewModel @Inject constructor(
                     _post.value = response
                 }
             } catch (e: Exception) {
-                _error.value = "Не удалось поставить лайк"
+                _error.value = ApiError(Constants.ERROR_LIKE)
             }
         }
     }

@@ -3,7 +3,6 @@ package ru.netology.nework.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,11 +17,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraPosition
-import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.netology.nework.BuildConfig
@@ -33,14 +30,18 @@ import ru.netology.nework.dto.Coordinates
 import ru.netology.nework.dto.Event
 import ru.netology.nework.enumeration.AttachmentType
 import ru.netology.nework.enumeration.EventType
+import ru.netology.nework.error.ApiError
+import ru.netology.nework.error.NetworkError
+import ru.netology.nework.error.NotFoundError
+import ru.netology.nework.utils.Constants.ARG_EVENT_ID
+import ru.netology.nework.utils.Constants.ARG_IS_CURRENT_USER
+import ru.netology.nework.utils.Constants.ARG_USER_ID
 import ru.netology.nework.viewmodel.EventDetailViewModel
 
 @AndroidEntryPoint
 class EventDetailFragment : Fragment() {
 
     companion object {
-        private const val ARG_EVENT_ID = "event_id"
-
         fun newInstance(eventId: Long): EventDetailFragment {
             return EventDetailFragment().apply {
                 arguments = Bundle().apply {
@@ -49,7 +50,6 @@ class EventDetailFragment : Fragment() {
             }
         }
     }
-
     private val viewModel by viewModels<EventDetailViewModel>()
     private var _binding: FragmentEventDetailBinding? = null
     private val binding get() = _binding!!
@@ -60,27 +60,26 @@ class EventDetailFragment : Fragment() {
                 findNavController().navigate(
                     R.id.action_global_userDetailFragment,
                     Bundle().apply {
-                        putLong("userId", user.id)
+                        putLong(ARG_USER_ID, user.id)
+                        putBoolean(ARG_IS_CURRENT_USER, false)
                     }
                 )
             }
         )
     }
-
     private val participantsAdapter by lazy {
         UsersAdapter(
             onItemClickListener = { user ->
                 findNavController().navigate(
                     R.id.action_global_userDetailFragment,
                     Bundle().apply {
-                        putLong("userId", user.id)
+                        putLong(ARG_USER_ID, user.id)
+                        putBoolean(ARG_IS_CURRENT_USER, false)
                     }
                 )
             }
         )
     }
-
-    private var isMapInitialized = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -93,7 +92,6 @@ class EventDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupToolbar()
         setupLists()
         setupObservers()
@@ -106,17 +104,13 @@ class EventDetailFragment : Fragment() {
             findNavController().popBackStack()
         }
     }
-
     private fun setupLists() {
-        // Список спикеров
         binding.speakersList.layoutManager = LinearLayoutManager(
             requireContext(),
             LinearLayoutManager.HORIZONTAL,
             false
         )
         binding.speakersList.adapter = speakersAdapter
-
-        // Список участников
         binding.participantsList.layoutManager = LinearLayoutManager(
             requireContext(),
             LinearLayoutManager.HORIZONTAL,
@@ -124,70 +118,67 @@ class EventDetailFragment : Fragment() {
         )
         binding.participantsList.adapter = participantsAdapter
     }
-
     private fun setupObservers() {
         viewModel.event.observe(viewLifecycleOwner) { event ->
             event?.let {
                 updateEventInfo(it)
             }
         }
-
         viewModel.speakers.observe(viewLifecycleOwner) { speakers ->
             speakersAdapter.submitList(speakers)
+            binding.speakersTitle.isVisible = speakers.isNotEmpty()
             binding.speakersList.isVisible = speakers.isNotEmpty()
         }
-
         viewModel.participants.observe(viewLifecycleOwner) { participants ->
             participantsAdapter.submitList(participants)
+            binding.participantsTitle.isVisible = participants.isNotEmpty()
             binding.participantsList.isVisible = participants.isNotEmpty()
         }
-
         viewModel.loading.observe(viewLifecycleOwner) { loading ->
             binding.progressBar.isVisible = loading
-            binding.contentContainer.isVisible = !loading
+            binding.scrollView.isVisible = !loading
         }
-
         viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
-                Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG)
+                val message = when (it) {
+                    is ApiError -> it.message ?: "Ошибка API"
+                    is NetworkError -> "Нет соединения с сетью"
+                    is NotFoundError -> "Событие не найдено"
+                    else -> "Неизвестная ошибка"
+                }
+                Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
                     .setAction(R.string.retry) { loadEvent() }
                     .show()
             }
         }
     }
-
     private fun setupListeners() {
         binding.likeButton.setOnClickListener {
             viewModel.event.value?.let { event ->
                 viewModel.likeEvent(event.id)
             }
         }
-
         binding.participateButton.setOnClickListener {
             viewModel.event.value?.let { event ->
                 viewModel.participateEvent(event.id)
             }
         }
-
-        binding.menuButton.setOnClickListener {
+        binding.optionsButton.setOnClickListener {
             viewModel.event.value?.let { event ->
                 showEventMenu(event)
             }
         }
-
         binding.attachmentContainer.setOnClickListener {
             viewModel.event.value?.attachment?.url?.let { url ->
                 openInBrowser(url)
             }
         }
-
         binding.linkContainer.setOnClickListener {
             viewModel.event.value?.link?.let { link ->
                 openInBrowser(link)
             }
         }
     }
-
     private fun loadEvent() {
         val eventId = arguments?.getLong(ARG_EVENT_ID) ?: 0L
         if (eventId != 0L) {
@@ -198,9 +189,7 @@ class EventDetailFragment : Fragment() {
             findNavController().popBackStack()
         }
     }
-
     private fun updateEventInfo(event: Event) {
-        binding.toolbar.title = "Событие от ${event.author}"
         if (!event.authorAvatar.isNullOrEmpty()) {
             Glide.with(requireContext())
                 .load(event.authorAvatar)
@@ -211,7 +200,8 @@ class EventDetailFragment : Fragment() {
             binding.authorAvatar.setImageResource(R.drawable.author_avatar)
         }
         binding.authorName.text = event.author
-        binding.authorJob.text = event.authorJob ?: getString(R.string.looking_for_job)
+        binding.published.text = event.formattedPublished
+        binding.eventDateTime.text = event.formattedDateTime
         binding.eventType.text = when (event.type) {
             EventType.ONLINE -> "ONLINE"
             EventType.OFFLINE -> "OFFLINE"
@@ -223,24 +213,13 @@ class EventDetailFragment : Fragment() {
         binding.eventType.setBackgroundColor(
             ContextCompat.getColor(requireContext(), typeColor)
         )
-        binding.eventDateTime.text = event.formattedDateTime
         binding.content.text = event.content
         binding.likeCount.text = event.likeOwnerIds.size.toString()
-        val likeIcon = if (event.likedByMe) {
-            R.drawable.ic_like_filled_24
-        } else {
-            R.drawable.ic_like_24
-        }
-        binding.likeButton.setImageResource(likeIcon)
-        val participateIcon = if (event.participatedByMe) {
-            R.drawable.ic_check_filled_24
-        } else {
-            R.drawable.ic_check
-        }
-        binding.participateButton.setImageResource(participateIcon)
+        binding.likeButton.setImageResource(
+            if (event.likedByMe) R.drawable.ic_like_filled_24 else R.drawable.ic_like_24
+        )
         val hasAttachment = event.attachment != null
         binding.attachmentContainer.isVisible = hasAttachment
-
         if (hasAttachment) {
             event.attachment?.let { attachment ->
                 binding.attachmentType.text = when (attachment.type) {
@@ -253,59 +232,48 @@ class EventDetailFragment : Fragment() {
         }
         val hasLink = !event.link.isNullOrEmpty()
         binding.linkContainer.isVisible = hasLink
-
         if (hasLink) {
             binding.linkText.text = event.link
         }
+        binding.authorJob.text = event.authorJob ?: getString(R.string.looking_for_job)
         val shouldShowMap = event.type == EventType.OFFLINE && event.coords != null
         binding.mapContainer.isVisible = shouldShowMap
-
-        if (shouldShowMap && !isMapInitialized) {
+        if (shouldShowMap) {
             event.coords?.let { coords ->
                 showMap(coords)
-                isMapInitialized = true
             }
         }
-        binding.menuButton.isVisible = event.ownedByMe
+        binding.optionsButton.isVisible = event.ownedByMe
     }
-
     private fun showMap(coords: Coordinates) {
         try {
             MapKitFactory.setApiKey(BuildConfig.YANDEX_MAPS_API_KEY)
             MapKitFactory.initialize(requireContext())
 
             val mapView = binding.mapView
-            val map = mapView.mapWindow.map
+            val map = mapView.map
             val point = Point(coords.lat, coords.long)
-            val mapObjects = map.mapObjects.addCollection()
-            mapObjects.addPlacemark().apply {
-                geometry = point
+            map.mapObjects.addPlacemark(point).apply {
                 setIcon(
-                    ImageProvider.fromResource(requireContext(), R.drawable.ic_map_pin)
+                    com.yandex.runtime.image.ImageProvider.fromResource(
+                        requireContext(), R.drawable.ic_map_pin
+                    )
                 )
-                opacity = 1.0f
             }
             map.move(
                 CameraPosition(point, 15.0f, 0.0f, 0.0f),
-                Animation(Animation.Type.SMOOTH, 0f),
+                com.yandex.mapkit.Animation(com.yandex.mapkit.Animation.Type.SMOOTH, 0.5f),
                 null
             )
-            mapView.mapWindow.map.isScrollGesturesEnabled = false
-            mapView.mapWindow.map.isZoomGesturesEnabled = false
-            mapView.mapWindow.map.isRotateGesturesEnabled = false
-            mapView.mapWindow.map.isTiltGesturesEnabled = false
-
             binding.coordsText.text = String.format("%.6f, %.6f", coords.lat, coords.long)
 
             MapKitFactory.getInstance().onStart()
             mapView.onStart()
 
         } catch (e: Exception) {
-            binding.mapContainer.visibility = View.GONE
-            Log.e("EventDetailFragment", "Ошибка инициализации карты", e)
+            binding.mapContainer.isVisible = false
         }
     }
-
     private fun openInBrowser(url: String) {
         try {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
@@ -318,7 +286,6 @@ class EventDetailFragment : Fragment() {
             ).show()
         }
     }
-
     private fun showEventMenu(event: Event) {
         val options = arrayOf(
             getString(R.string.edit),
@@ -326,7 +293,7 @@ class EventDetailFragment : Fragment() {
         )
 
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.event_menu)
+            .setTitle(R.string.event_options)
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> navigateToEditEvent(event.id)
@@ -336,15 +303,18 @@ class EventDetailFragment : Fragment() {
             .setNegativeButton(R.string.cancel, null)
             .show()
     }
-
     private fun navigateToEditEvent(eventId: Long) {
-        Snackbar.make(binding.root, "Редактирование события $eventId", Snackbar.LENGTH_SHORT).show()
+        findNavController().navigate(
+            R.id.newEventFragment,
+            Bundle().apply {
+                putLong(ARG_EVENT_ID, eventId)
+            }
+        )
     }
-
     private fun deleteEvent(eventId: Long) {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.delete)
-            .setMessage("Удалить это событие?")
+            .setTitle(R.string.delete_event)
+            .setMessage(R.string.delete_event_confirmation)
             .setPositiveButton(R.string.delete) { _, _ ->
                 viewModel.deleteEvent(eventId)
                 findNavController().popBackStack()
@@ -355,14 +325,14 @@ class EventDetailFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        if (binding.mapContainer.visibility == View.VISIBLE && isMapInitialized) {
+        if (binding.mapContainer.isVisible) {
             MapKitFactory.getInstance().onStart()
             binding.mapView.onStart()
         }
     }
 
     override fun onStop() {
-        if (binding.mapContainer.visibility == View.VISIBLE && isMapInitialized) {
+        if (binding.mapContainer.isVisible) {
             binding.mapView.onStop()
             MapKitFactory.getInstance().onStop()
         }
@@ -370,8 +340,8 @@ class EventDetailFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        if (isMapInitialized) {
-            binding.mapView.mapWindow.map.mapObjects.clear()
+        if (binding.mapContainer.isVisible) {
+            binding.mapView.map.mapObjects.clear()
         }
         super.onDestroyView()
         _binding = null

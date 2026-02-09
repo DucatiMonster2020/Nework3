@@ -11,20 +11,14 @@ object AuthStateManager {
 
     private var currentToken: Token? = null
 
-    init {
-        // TODO: загрузить токен из SharedPreferences
-    }
-
     fun signIn(token: Token) {
         currentToken = token
         _authState.value = AuthState.Authorized(token)
-        // TODO: сохранить токен в SharedPreferences
     }
 
     fun signOut() {
         currentToken = null
         _authState.value = AuthState.Unauthorized
-        // TODO: очистить токен из SharedPreferences
     }
 
     fun getToken(): String? = currentToken?.token

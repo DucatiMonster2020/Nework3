@@ -15,7 +15,7 @@
     <string name="link">Ссылка</string>
     <string name="loading">Загрузка...</string>
     <string name="error">Ошибка</string>
-    <string name="retry">Retry</string>
+    <string name="retry">Повторить</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>
     <string name="sign_out">Sign Out</string>
@@ -25,12 +25,13 @@
     <string name="repeat_password">Repeat Password</string>
     <string name="select_photo">Выбрать фото</string>
     <string name="save">Save</string>
-    <string name="cancel">Cancel</string>
-    <string name="delete">Delete</string>
-    <string name="edit">Edit</string>
+    <string name="cancel">Отменить</string>
+    <string name="delete">Удалить</string>
+    <string name="edit">Редактировать</string>
     <string name="like">Like</string>
     <string name="share">Share</string>
     <string name="menu">Menu</string>
+    <string name="event_options">Опции события</string>
     <string name="attachment">Attachment</string>
     <string name="no_posts_subtitle">Be the first to create a post</string>
     <string name="no_events_subtitle">Be the first to create an event</string>
@@ -68,6 +69,7 @@
     <string name="add_post">Добавить пост</string>
     <string name="looking_for_job">В поиске работы</string>
     <string name="delete_post">Удалить пост</string>
+    <string name="delete_event">Удалить событие</string>
     <string name="delete_post_confirmation">Удалить этот пост?</string>
     <string name="edit_post">Редактировать</string>
     <string name="copy_text">Скопировать текст</string>
@@ -104,10 +106,14 @@
     <string name="event_menu">Меню события</string>
     <string name="speakers">Спикеры</string>
     <string name="participants">Участники</string>
+    <string name="loading_coords">Координаты загружаются…</string>
+
+    <string name="confirm_location">Подтвердить местоположение</string>
+    <string name="select_location_on_map">Выберите место на карте</string>
+
+
     <string name="my_wall">Моя стена</string>
     <string name="my_jobs">Мои работы</string>
-    <string name="confirm_location">Подтвердить выбор</string>
-    <string name="select_location_on_map">Выберите место на карте</string>
     <string name="location_selected">Местоположение выбрано</string>
     <string name="location_not_selected">Местоположение не выбрано</string>
     <string name="yandex_maps_api_key">Требуется API_KEY</string>
@@ -151,4 +157,6 @@
     <string name="new_event">Новое событие</string>
     <string name="avatar">Аватар</string>
     <string name="CT">НВ</string>
+    <string name="delete_event_confirmation">Удалить это событие?</string>
+
 </resources>

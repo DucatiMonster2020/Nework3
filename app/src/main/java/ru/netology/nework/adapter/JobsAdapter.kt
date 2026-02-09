@@ -33,37 +33,22 @@ class JobsAdapter(
 
         fun bind(job: Job) {
             binding.apply {
-                // По ТЗ: название компании
                 companyName.text = job.name
-
-                // По ТЗ: должность
                 position.text = job.position
-
-                // По ТЗ: стаж в формате dd MMM yyyy
                 period.text = formatPeriod(job.start, job.finish)
-
-                // Ссылка на сайт (не обязательно по ТЗ, но может быть)
                 companyLink.isVisible = !job.link.isNullOrEmpty()
                 if (!job.link.isNullOrEmpty()) {
                     companyLink.text = job.link
                 }
-
-                // Кнопка меню только для своих работ (п.7 ТЗ)
                 menuButton.isVisible = job.ownedByMe
-
-                // Клик на карточку
                 root.setOnClickListener {
                     onItemClickListener(job)
                 }
                 if (!job.link.isNullOrEmpty()) {
                     companyLink.setOnClickListener {
-                        // Можно открыть в браузере, но не обязательно по ТЗ
                     }
                 }
-
-                // Кнопка меню
                 menuButton.setOnClickListener {
-                    // Для своего профиля (п.7 ТЗ)
                 }
             }
         }
@@ -87,7 +72,6 @@ class JobsAdapter(
                     "$startFormatted - настоящее время"
                 }
             } catch (e: Exception) {
-                // Если не удалось распарсить, показываем как есть
                 if (finish != null) {
                     "$start - $finish"
                 } else {
@@ -97,7 +81,6 @@ class JobsAdapter(
         }
     }
 }
-
 class JobDiffCallback : DiffUtil.ItemCallback<Job>() {
     override fun areItemsTheSame(oldItem: Job, newItem: Job): Boolean {
         return oldItem.id == newItem.id

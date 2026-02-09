@@ -14,10 +14,10 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nework.R
 import ru.netology.nework.adapter.PostsAdapter
-import ru.netology.nework.auth.AuthStateManager
 import ru.netology.nework.auth.AuthStateManager.authState
 import ru.netology.nework.databinding.FragmentPostsBinding
 import ru.netology.nework.dto.Post
+import ru.netology.nework.utils.Constants.ARG_POST_ID
 import ru.netology.nework.viewmodel.PostsViewModel
 
 @AndroidEntryPoint
@@ -36,7 +36,7 @@ class PostsFragment : Fragment() {
                 findNavController().navigate(
                     R.id.action_postsFragment_to_postDetailFragment,
                     Bundle().apply {
-                        putLong("postId", post.id)
+                        putLong(ARG_POST_ID, post.id)
                     }
                 )
             },

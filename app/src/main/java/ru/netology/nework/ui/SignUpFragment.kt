@@ -18,6 +18,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.netology.nework.R
 import ru.netology.nework.databinding.FragmentSignUpBinding
+import ru.netology.nework.error.ApiError
+import ru.netology.nework.error.NetworkError
+import ru.netology.nework.error.ValidationError
 import ru.netology.nework.viewmodel.SignUpViewModel
 
 @AndroidEntryPoint
@@ -27,12 +30,21 @@ class SignUpFragment : Fragment() {
     private var _binding: FragmentSignUpBinding? = null
     private val binding get() = _binding!!
     private var selectedImageUri: Uri? = null
+
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
-    ) { uri ->
+    ) { uri: Uri? ->
         uri?.let {
-            selectedImageUri = it
-            loadImage(it)
+            if (validateImageFormat(it)) {
+                selectedImageUri = it
+                loadImage(it)
+            } else {
+                Snackbar.make(
+                    binding.root,
+                    "Формат должен быть JPG или PNG, размер до 2048x2048",
+                    Snackbar.LENGTH_LONG
+                ).show()
+            }
         }
     }
 
@@ -65,11 +77,13 @@ class SignUpFragment : Fragment() {
 
         viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
-                if (it.contains("400")) {
-                    Snackbar.make(binding.root, "Пользователь с таким логином уже зарегистрирован", Snackbar.LENGTH_LONG).show()
-                } else {
-                    Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).show()
+                val message = when (it) {
+                    is ApiError -> it.message ?: "Ошибка API"
+                    is NetworkError -> "Нет соединения с сетью"
+                    is ValidationError -> "Ошибка валидации данных"
+                    else -> "Неизвестная ошибка"
                 }
+                Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
             }
         }
 
@@ -88,6 +102,7 @@ class SignUpFragment : Fragment() {
         binding.avatarButton.setOnClickListener {
             pickImageLauncher.launch("image/*")
         }
+
         listOf(
             binding.loginInput,
             binding.nameInput,
@@ -116,14 +131,28 @@ class SignUpFragment : Fragment() {
             binding.passwordConfirmInput.error = "Пароли не совпадают"
             return
         }
+        if (selectedImageUri == null) {
+            Snackbar.make(binding.root, "Выберите аватар", Snackbar.LENGTH_SHORT).show()
+            return
+        }
 
         lifecycleScope.launch {
             viewModel.signUp(
+                context = requireContext(),
                 login = login,
                 name = name,
                 password = password,
                 avatarUri = selectedImageUri
             )
+        }
+    }
+
+    private fun validateImageFormat(uri: Uri): Boolean {
+        return try {
+            val mimeType = requireContext().contentResolver.getType(uri)
+            mimeType in arrayOf("image/jpeg", "image/png", "image/jpg")
+        } catch (e: Exception) {
+            false
         }
     }
 
@@ -187,6 +216,7 @@ class SignUpFragment : Fragment() {
                 .into(binding.avatarImage)
 
             binding.avatarImage.isVisible = true
+            binding.avatarButton.text = "Изменить аватар"
 
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "Ошибка загрузки изображения", Toast.LENGTH_SHORT).show()

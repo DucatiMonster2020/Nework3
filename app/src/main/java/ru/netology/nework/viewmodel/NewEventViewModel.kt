@@ -10,7 +10,9 @@ import kotlinx.coroutines.launch
 import ru.netology.nework.api.ApiService
 import ru.netology.nework.dto.Event
 import ru.netology.nework.enumeration.EventType
+import ru.netology.nework.error.ApiError
 import ru.netology.nework.error.AppError
+import ru.netology.nework.utils.SingleLiveEvent
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -25,10 +27,10 @@ class NewEventViewModel @Inject constructor(
     private val _loading = MutableLiveData(false)
     val loading: LiveData<Boolean> = _loading
 
-    private val _error = MutableLiveData<String?>()
-    val error: LiveData<String?> = _error
+    private val _error = SingleLiveEvent<AppError?>()
+    val error: LiveData<AppError?> = _error
 
-    private val _success = MutableLiveData(false)
+    private val _success = SingleLiveEvent<Boolean>()
     val success: LiveData<Boolean> = _success
 
     fun saveEvent(
@@ -48,6 +50,7 @@ class NewEventViewModel @Inject constructor(
                 val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
                 dateFormat.timeZone = TimeZone.getTimeZone("UTC")
                 val datetimeString = dateFormat.format(datetime)
+
                 val event = Event(
                     id = 0,
                     author = "",
@@ -74,10 +77,10 @@ class NewEventViewModel @Inject constructor(
                 if (response.isSuccessful) {
                     _success.value = true
                 } else {
-                    _error.value = "Ошибка создания события: ${response.code()}"
+                    _error.value = ApiError("Ошибка создания события: ${response.code()}")
                 }
             } catch (e: Exception) {
-                _error.value = AppError.fromThrowable(e).message
+                _error.value = AppError.fromThrowable(e)
             } finally {
                 _loading.value = false
             }

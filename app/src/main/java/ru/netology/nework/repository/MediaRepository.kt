@@ -1,5 +1,6 @@
 package ru.netology.nework.repository
 
+import android.net.Uri
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -19,7 +20,6 @@ class MediaRepository @Inject constructor(
 
     suspend fun upload(uri: Uri, type: AttachmentType): Media {
         return try {
-            // Создаем MultipartBody.Part из Uri
             val file = FileUtils.getFileFromUri(uri) ?: throw IOException("Не удалось получить файл")
 
             val requestFile = file.asRequestBody(

@@ -2,9 +2,11 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    tools:context=".ui.EventDetailFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -24,7 +26,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/contentContainer"
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -34,6 +36,24 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end"
+                android:layout_marginBottom="12dp">
+
+                <ImageButton
+                    android:id="@+id/optionsButton"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:contentDescription="@string/menu"
+                    app:srcCompat="@drawable/ic_more_vert_24"
+                    android:visibility="gone" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -48,17 +68,26 @@
                     android:background="@drawable/event_type_background"
                     android:paddingHorizontal="12dp"
                     android:paddingVertical="6dp"
-                    android:text="ONLINE"
+                    android:text="@string/loading"
                     android:textColor="@android:color/white"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="12dp" />
 
                 <TextView
+                    android:id="@+id/published"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/loading"
+                    android:textColor="@color/on_surface"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
                     android:id="@+id/eventDateTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="28.08.22 19:00"
+                    android:text="@string/loading"
                     android:textColor="@color/on_surface"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -93,7 +122,7 @@
                         android:id="@+id/authorName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Adison Levin"
+                        android:text="@string/loading"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="@color/on_surface" />
@@ -103,7 +132,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="iOS Developer"
+                        android:text="@string/loading"
                         android:textSize="14sp"
                         android:textColor="@color/on_surface_variant" />
 
@@ -116,7 +145,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                android:text="Текст события..."
+                android:text="@string/loading"
                 android:textSize="16sp"
                 android:textColor="@color/on_surface"
                 android:lineSpacingExtra="4dp" />
@@ -129,7 +158,8 @@
                 android:padding="12dp"
                 android:background="?attr/selectableItemBackground"
                 android:layout_marginBottom="16dp"
-                android:visibility="gone">
+                android:visibility="gone"
+                android:clickable="true">
 
                 <ImageView
                     android:layout_width="24dp"
@@ -171,7 +201,8 @@
                 android:padding="12dp"
                 android:background="?attr/selectableItemBackground"
                 android:layout_marginBottom="16dp"
-                android:visibility="gone">
+                android:visibility="gone"
+                android:clickable="true">
 
                 <ImageView
                     android:layout_width="24dp"
@@ -217,7 +248,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:gravity="center_vertical"
-                        android:text="10"
+                        android:text="0"
                         android:textColor="@color/on_surface"
                         android:textSize="14sp" />
 
@@ -242,6 +273,7 @@
                 android:layout_marginBottom="24dp" />
 
             <TextView
+                android:id="@+id/speakersTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/speakers"
@@ -265,6 +297,7 @@
                 android:layout_marginBottom="24dp" />
 
             <TextView
+                android:id="@+id/participantsTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/participants"
@@ -298,12 +331,11 @@
                     android:textColor="@color/on_surface"
                     android:layout_margin="16dp" />
 
-                <ImageView
+                <com.yandex.mapkit.mapview.MapView
+                    android:id="@+id/mapView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/ic_map_placeholder"
-                    android:scaleType="centerCrop"
-                    android:contentDescription="@string/map" />
+                    tools:ignore="MissingPrefix" />
 
                 <TextView
                     android:id="@+id/coordsText"
@@ -314,13 +346,12 @@
                     android:background="@android:color/white"
                     android:paddingHorizontal="12dp"
                     android:paddingVertical="8dp"
-                    android:text="55.7558, 37.6176"
+                    android:text="@string/loading_coords"
                     android:textSize="12sp"
                     android:textColor="@color/on_surface"
                     android:elevation="4dp" />
 
             </LinearLayout>
-
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

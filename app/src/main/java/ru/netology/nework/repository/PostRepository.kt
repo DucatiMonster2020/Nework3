@@ -12,9 +12,7 @@ class PostRepository @Inject constructor(
 ) {
     suspend fun getAll(): List<Post> {
         try {
-            // Теперь метод существует!
             val response = apiService.getAllPosts()
-
             if (!response.isSuccessful) {
                 throw AppError.fromThrowable(
                     retrofit2.HttpException(response)

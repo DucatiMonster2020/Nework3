@@ -9,8 +9,11 @@ import kotlinx.coroutines.launch
 import ru.netology.nework.api.ApiService
 import ru.netology.nework.dto.Event
 import ru.netology.nework.dto.User
+import ru.netology.nework.error.ApiError
 import ru.netology.nework.error.AppError
 import ru.netology.nework.repository.EventRepository
+import ru.netology.nework.utils.Constants
+import ru.netology.nework.utils.SingleLiveEvent
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,8 +34,8 @@ class EventDetailViewModel @Inject constructor(
     private val _loading = MutableLiveData(false)
     val loading: LiveData<Boolean> = _loading
 
-    private val _error = MutableLiveData<String?>()
-    val error: LiveData<String?> = _error
+    private val _error = SingleLiveEvent<AppError?>()
+    val error: LiveData<AppError?> = _error
 
     fun loadEvent(eventId: Long) {
         viewModelScope.launch {
@@ -47,10 +50,10 @@ class EventDetailViewModel @Inject constructor(
                     event?.speakerIds?.let { loadSpeakers(it) }
                     event?.participantsIds?.let { loadParticipants(it) }
                 } else {
-                    _error.value = "Не удалось загрузить событие"
+                    _error.value = ApiError(Constants.ERROR_LOAD_EVENT)
                 }
             } catch (e: Exception) {
-                _error.value = AppError.fromThrowable(e).message
+                _error.value = AppError.fromThrowable(e)
             } finally {
                 _loading.value = false
             }
@@ -78,6 +81,7 @@ class EventDetailViewModel @Inject constructor(
                 _participants.value = participantUsers
             }
         } catch (e: Exception) {
+
         }
     }
 
@@ -90,7 +94,7 @@ class EventDetailViewModel @Inject constructor(
                     loadEvent(eventId)
                 }
             } catch (e: Exception) {
-                _error.value = "Не удалось поставить лайк"
+                _error.value = ApiError(Constants.ERROR_LIKE)
             }
         }
     }
@@ -108,7 +112,7 @@ class EventDetailViewModel @Inject constructor(
                     loadEvent(eventId)
                 }
             } catch (e: Exception) {
-                _error.value = "Не удалось изменить участие"
+                _error.value = ApiError("Не удалось изменить участие")
             }
         }
     }
@@ -119,7 +123,7 @@ class EventDetailViewModel @Inject constructor(
                 eventRepository.removeById(eventId)
                 _event.value = null
             } catch (e: Exception) {
-                _error.value = "Не удалось удалить событие"
+                _error.value = ApiError("${Constants.ERROR_DELETE} событие")
             }
         }
     }

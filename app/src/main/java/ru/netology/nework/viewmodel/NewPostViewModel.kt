@@ -1,6 +1,5 @@
 package ru.netology.nework.viewmodel
 
-import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,10 +12,12 @@ import ru.netology.nework.dto.Coordinates
 import ru.netology.nework.dto.Post
 import ru.netology.nework.dto.User
 import ru.netology.nework.enumeration.AttachmentType
+import ru.netology.nework.error.ApiError
 import ru.netology.nework.error.AppError
 import ru.netology.nework.repository.MediaRepository
 import ru.netology.nework.repository.PostRepository
 import ru.netology.nework.repository.UserRepository
+import ru.netology.nework.utils.SingleLiveEvent
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,10 +31,10 @@ class NewPostViewModel @Inject constructor(
     private val _loading = MutableLiveData(false)
     val loading: LiveData<Boolean> = _loading
 
-    private val _error = MutableLiveData<String?>()
-    val error: LiveData<String?> = _error
+    private val _error = SingleLiveEvent<AppError?>()
+    val error: LiveData<AppError?> = _error
 
-    private val _success = MutableLiveData(false)
+    private val _success = SingleLiveEvent<Boolean>()
     val success: LiveData<Boolean> = _success
 
     suspend fun loadUsersByIds(userIds: List<Long>): List<User> {
@@ -45,7 +46,7 @@ class NewPostViewModel @Inject constructor(
         }
     }
 
-    suspend fun uploadMedia(uri: Uri, type: AttachmentType): String {
+    suspend fun uploadMedia(uri: android.net.Uri, type: AttachmentType): String {
         return try {
             _loading.postValue(true)
             val response = mediaRepository.upload(uri, type)
@@ -69,6 +70,7 @@ class NewPostViewModel @Inject constructor(
                 _loading.value = true
                 _error.value = null
                 _success.value = false
+
                 val post = Post(
                     id = 0,
                     author = "",
@@ -86,15 +88,16 @@ class NewPostViewModel @Inject constructor(
                     attachment = attachment,
                     ownedByMe = true
                 )
+
                 val response = postRepository.save(post)
 
                 if (response != null) {
                     _success.value = true
                 } else {
-                    _error.value = "Ошибка создания поста"
+                    _error.value = ApiError("Ошибка создания поста")
                 }
             } catch (e: Exception) {
-                _error.value = AppError.fromThrowable(e).message
+                _error.value = AppError.fromThrowable(e)
             } finally {
                 _loading.value = false
             }

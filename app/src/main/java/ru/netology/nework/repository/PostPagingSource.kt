@@ -10,7 +10,6 @@ class PostPagingSource(
 ) : PagingSource<Long, Post>() {
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, Post> {
         return try {
-            // TODO: реализовать пагинацию
             LoadResult.Page(emptyList(), null, null)
         } catch (e: Exception) {
             LoadResult.Error(e)
