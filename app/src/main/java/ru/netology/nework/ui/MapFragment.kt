@@ -12,8 +12,7 @@ import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraPosition
-import com.yandex.mapkit.map.InputListener
-import com.yandex.runtime.image.ImageProvider
+import com.yandex.mapkit.map.MapObjectCollection
 import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nework.BuildConfig
 import ru.netology.nework.R
@@ -43,6 +42,7 @@ class MapFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupToolbar()
+
         MapKitFactory.setApiKey(BuildConfig.YANDEX_MAPS_API_KEY)
         MapKitFactory.initialize(requireContext())
 
@@ -54,118 +54,42 @@ class MapFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
         }
+        binding.toolbar.title = "Выбор места"
     }
 
     private fun setupMap() {
         val mapView = binding.mapView
-        val map = mapView.map
+        val map = mapView.mapWindow.map
         val targetLocation = Point(55.7558, 37.6176)
         map.move(
             CameraPosition(targetLocation, 10.0f, 0.0f, 0.0f),
             Animation(Animation.Type.SMOOTH, 0f),
             null
         )
-
-        // ВАРИАНТ 1: Если есть метод addTapListener (новая версия)
-        try {
-            map.addTapListener { point ->
+        map.addInputListener(object : com.yandex.mapkit.map.InputListener {
+            override fun onMapTap(map: com.yandex.mapkit.map.Map, point: Point) {
                 selectedLocation = point
                 addMarker(point)
                 binding.confirmButton.isVisible = true
-                true // возвращаем true, если обработка выполнена
-            }
-        } catch (e: NoSuchMethodError) {
-            // ВАРИАНТ 2: Старая версия с InputListener
-            setupMapWithInputListener(map)
-        }
-    }
-
-    // Метод для старой версии MapKit
-    private fun setupMapWithInputListener(map: com.yandex.mapkit.map.Map) {
-        val listener = object : com.yandex.mapkit.map.InputListener {
-            // Попробуйте разные варианты сигнатур:
-
-            // Вариант A:
-            override fun onMapTap(p0: com.yandex.mapkit.map.Map, p1: Point) {
-                selectedLocation = p1
-                addMarker(p1)
-                binding.confirmButton.isVisible = true
             }
 
-            override fun onMapLongTap(p0: com.yandex.mapkit.map.Map, p1: Point) {
-                // Не используется
+            override fun onMapLongTap(map: com.yandex.mapkit.map.Map, point: Point) {
             }
-
-            // ИЛИ Вариант B (если предыдущий не работает):
-            // override fun onMapTap(map: com.yandex.mapkit.map.Map, point: Point) {
-            //     selectedLocation = point
-            //     addMarker(point)
-            //     binding.confirmButton.isVisible = true
-            // }
-
-            // override fun onMapLongTap(map: com.yandex.mapkit.map.Map, point: Point) {
-            //     // Не используется
-            // }
-        }
-
-        try {
-            map.addInputListener(listener)
-        } catch (e: Exception) {
-            // Если и это не работает, используем альтернативный подход
-            setupMapAlternative()
-        }
-    }
-
-    // Альтернативный подход без InputListener
-    private fun setupMapAlternative() {
-        // Используем GestureListener или другой подход
-        Snackbar.make(
-            binding.root,
-            "Нажмите на карту для выбора местоположения",
-            Snackbar.LENGTH_LONG
-        ).show()
-
-        // Можно добавить кнопку "Выбрать текущее местоположение"
+        })
     }
 
     private fun addMarker(point: Point) {
         val mapView = binding.mapView
-        val map = mapView.map
-
-        // Очищаем предыдущие маркеры
+        val map = mapView.mapWindow.map
         map.mapObjects.clear()
-
-        try {
-            // Добавляем новый маркер
-            val placemark = map.mapObjects.addPlacemark(point)
-            placemark.setIcon(
-                com.yandex.runtime.image.ImageProvider.fromResource(
-                    requireContext(), R.drawable.ic_map_pin
-                )
+        val mapObjects: MapObjectCollection = map.mapObjects
+        val placemark = mapObjects.addPlacemark(point)
+        placemark.setIcon(
+            com.yandex.runtime.image.ImageProvider.fromResource(
+                requireContext(), R.drawable.ic_map_pin
             )
-            placemark.opacity = 1.0f
-
-        } catch (e: Exception) {
-            // Альтернативный способ добавления маркера
-            try {
-                val collection = map.mapObjects.addCollection()
-                val placemark = collection.addPlacemark(point)
-                placemark.setIcon(
-                    com.yandex.runtime.image.ImageProvider.fromResource(
-                        requireContext(), R.drawable.ic_map_pin
-                    )
-                )
-            } catch (e2: Exception) {
-                // Просто показываем координаты
-                Snackbar.make(
-                    binding.root,
-                    "Выбрано: ${point.latitude}, ${point.longitude}",
-                    Snackbar.LENGTH_SHORT
-                ).show()
-            }
-        }
-
-        // Приближаем к выбранной точке
+        )
+        placemark.opacity = 1.0f
         map.move(
             CameraPosition(point, 15.0f, 0.0f, 0.0f),
             Animation(Animation.Type.SMOOTH, 0.5f),
@@ -180,8 +104,6 @@ class MapFragment : Fragment() {
                     putDouble(LOCATION_LAT, location.latitude)
                     putDouble(LOCATION_LNG, location.longitude)
                 }
-
-                // Возвращаем результат предыдущему фрагменту
                 parentFragmentManager.setFragmentResult(
                     LOCATION_REQUEST_KEY,
                     result
@@ -196,8 +118,8 @@ class MapFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        MapKitFactory.getInstance().onStart()
         binding.mapView.onStart()
+        MapKitFactory.getInstance().onStart()
     }
 
     override fun onStop() {
@@ -207,11 +129,7 @@ class MapFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        try {
-            binding.mapView.map.mapObjects.clear()
-        } catch (e: Exception) {
-            // Игнорируем ошибку очистки
-        }
+        binding.mapView.mapWindow.map.mapObjects.clear()
         super.onDestroyView()
         _binding = null
     }
