@@ -11,18 +11,17 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraPosition
+import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import ru.netology.nework.BuildConfig
 import ru.netology.nework.R
 import ru.netology.nework.adapter.UsersAdapter
 import ru.netology.nework.databinding.FragmentEventDetailBinding
@@ -30,26 +29,16 @@ import ru.netology.nework.dto.Coordinates
 import ru.netology.nework.dto.Event
 import ru.netology.nework.enumeration.AttachmentType
 import ru.netology.nework.enumeration.EventType
-import ru.netology.nework.error.ApiError
-import ru.netology.nework.error.NetworkError
-import ru.netology.nework.error.NotFoundError
+import ru.netology.nework.error.AppError
 import ru.netology.nework.utils.Constants.ARG_EVENT_ID
 import ru.netology.nework.utils.Constants.ARG_IS_CURRENT_USER
 import ru.netology.nework.utils.Constants.ARG_USER_ID
+import ru.netology.nework.utils.CoordinatesUtils
 import ru.netology.nework.viewmodel.EventDetailViewModel
 
 @AndroidEntryPoint
 class EventDetailFragment : Fragment() {
 
-    companion object {
-        fun newInstance(eventId: Long): EventDetailFragment {
-            return EventDetailFragment().apply {
-                arguments = Bundle().apply {
-                    putLong(ARG_EVENT_ID, eventId)
-                }
-            }
-        }
-    }
     private val viewModel by viewModels<EventDetailViewModel>()
     private var _binding: FragmentEventDetailBinding? = null
     private val binding get() = _binding!!
@@ -67,6 +56,7 @@ class EventDetailFragment : Fragment() {
             }
         )
     }
+
     private val participantsAdapter by lazy {
         UsersAdapter(
             onItemClickListener = { user ->
@@ -104,6 +94,7 @@ class EventDetailFragment : Fragment() {
             findNavController().popBackStack()
         }
     }
+
     private fun setupLists() {
         binding.speakersList.layoutManager = LinearLayoutManager(
             requireContext(),
@@ -111,6 +102,7 @@ class EventDetailFragment : Fragment() {
             false
         )
         binding.speakersList.adapter = speakersAdapter
+
         binding.participantsList.layoutManager = LinearLayoutManager(
             requireContext(),
             LinearLayoutManager.HORIZONTAL,
@@ -118,83 +110,84 @@ class EventDetailFragment : Fragment() {
         )
         binding.participantsList.adapter = participantsAdapter
     }
+
     private fun setupObservers() {
         viewModel.event.observe(viewLifecycleOwner) { event ->
-            event?.let {
-                updateEventInfo(it)
-            }
+            event?.let { updateEventInfo(it) }
         }
+
         viewModel.speakers.observe(viewLifecycleOwner) { speakers ->
             speakersAdapter.submitList(speakers)
             binding.speakersTitle.isVisible = speakers.isNotEmpty()
             binding.speakersList.isVisible = speakers.isNotEmpty()
         }
+
         viewModel.participants.observe(viewLifecycleOwner) { participants ->
             participantsAdapter.submitList(participants)
             binding.participantsTitle.isVisible = participants.isNotEmpty()
             binding.participantsList.isVisible = participants.isNotEmpty()
         }
+
         viewModel.loading.observe(viewLifecycleOwner) { loading ->
             binding.progressBar.isVisible = loading
             binding.scrollView.isVisible = !loading
         }
+
         viewModel.error.observe(viewLifecycleOwner) { error ->
-            error?.let {
-                val message = when (it) {
-                    is ApiError -> it.message ?: "Ошибка API"
-                    is NetworkError -> "Нет соединения с сетью"
-                    is NotFoundError -> "Событие не найдено"
-                    else -> "Неизвестная ошибка"
-                }
-                Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
-                    .setAction(R.string.retry) { loadEvent() }
-                    .show()
-            }
+            error?.let { showError(it) }
         }
     }
+
     private fun setupListeners() {
         binding.likeButton.setOnClickListener {
             viewModel.event.value?.let { event ->
                 viewModel.likeEvent(event.id)
             }
         }
+
         binding.participateButton.setOnClickListener {
             viewModel.event.value?.let { event ->
                 viewModel.participateEvent(event.id)
             }
         }
+
         binding.optionsButton.setOnClickListener {
             viewModel.event.value?.let { event ->
-                showEventMenu(event)
+                if (event.ownedByMe) {
+                    showEventMenu(event)
+                }
             }
         }
+
         binding.attachmentContainer.setOnClickListener {
             viewModel.event.value?.attachment?.url?.let { url ->
                 openInBrowser(url)
             }
         }
+
         binding.linkContainer.setOnClickListener {
             viewModel.event.value?.link?.let { link ->
                 openInBrowser(link)
             }
         }
     }
+
     private fun loadEvent() {
         val eventId = arguments?.getLong(ARG_EVENT_ID) ?: 0L
         if (eventId != 0L) {
-            lifecycleScope.launch {
-                viewModel.loadEvent(eventId)
-            }
+            viewModel.loadEvent(eventId)
         } else {
             findNavController().popBackStack()
         }
     }
+
     private fun updateEventInfo(event: Event) {
         if (!event.authorAvatar.isNullOrEmpty()) {
             Glide.with(requireContext())
                 .load(event.authorAvatar)
                 .circleCrop()
                 .placeholder(R.drawable.author_avatar)
+                .error(R.drawable.author_avatar)
                 .into(binding.authorAvatar)
         } else {
             binding.authorAvatar.setImageResource(R.drawable.author_avatar)
@@ -202,6 +195,9 @@ class EventDetailFragment : Fragment() {
         binding.authorName.text = event.author
         binding.published.text = event.formattedPublished
         binding.eventDateTime.text = event.formattedDateTime
+        binding.content.text = event.content
+        binding.authorJob.text = event.authorJob ?: getString(R.string.looking_for_job)
+
         binding.eventType.text = when (event.type) {
             EventType.ONLINE -> "ONLINE"
             EventType.OFFLINE -> "OFFLINE"
@@ -213,77 +209,57 @@ class EventDetailFragment : Fragment() {
         binding.eventType.setBackgroundColor(
             ContextCompat.getColor(requireContext(), typeColor)
         )
-        binding.content.text = event.content
+
         binding.likeCount.text = event.likeOwnerIds.size.toString()
         binding.likeButton.setImageResource(
             if (event.likedByMe) R.drawable.ic_like_filled_24 else R.drawable.ic_like_24
         )
-        val hasAttachment = event.attachment != null
-        binding.attachmentContainer.isVisible = hasAttachment
-        if (hasAttachment) {
-            event.attachment?.let { attachment ->
-                binding.attachmentType.text = when (attachment.type) {
-                    AttachmentType.IMAGE -> "Фото"
-                    AttachmentType.VIDEO -> "Видео"
-                    AttachmentType.AUDIO -> "Аудио"
-                }
-                binding.attachmentUrl.text = attachment.url
+
+        binding.participateButton.text = if (event.participatedByMe) {
+            "Отменить участие"
+        } else {
+            "Участвовать"
+        }
+
+        binding.attachmentContainer.isVisible = event.attachment != null
+        event.attachment?.let { attachment ->
+            binding.attachmentType.text = when (attachment.type) {
+                AttachmentType.IMAGE -> "Фото"
+                AttachmentType.VIDEO -> "Видео"
+                AttachmentType.AUDIO -> "Аудио"
             }
         }
-        val hasLink = !event.link.isNullOrEmpty()
-        binding.linkContainer.isVisible = hasLink
-        if (hasLink) {
-            binding.linkText.text = event.link
+
+        binding.linkContainer.isVisible = !event.link.isNullOrEmpty()
+        binding.linkText.text = event.link
+
+        binding.mapContainer.isVisible = event.type == EventType.OFFLINE && event.coords != null
+        if (event.type == EventType.OFFLINE && event.coords != null) {
+            showMap(event.coords)
         }
-        binding.authorJob.text = event.authorJob ?: getString(R.string.looking_for_job)
-        val shouldShowMap = event.type == EventType.OFFLINE && event.coords != null
-        binding.mapContainer.isVisible = shouldShowMap
-        if (shouldShowMap) {
-            event.coords?.let { coords ->
-                showMap(coords)
-            }
-        }
+
         binding.optionsButton.isVisible = event.ownedByMe
     }
+
     private fun showMap(coords: Coordinates) {
         try {
-            MapKitFactory.setApiKey(BuildConfig.YANDEX_MAPS_API_KEY)
-            MapKitFactory.initialize(requireContext())
-
-            val mapView = binding.mapView
-            val map = mapView.map
             val point = Point(coords.lat, coords.long)
-            map.mapObjects.addPlacemark(point).apply {
-                setIcon(
-                    com.yandex.runtime.image.ImageProvider.fromResource(
-                        requireContext(), R.drawable.ic_map_pin
-                    )
-                )
-            }
+            val map = binding.mapView.map
+
+            map.mapObjects.clear()
+            map.mapObjects.addPlacemark(point,
+                ImageProvider.fromResource(requireContext(), R.drawable.ic_map_pin)
+            )
+
             map.move(
                 CameraPosition(point, 15.0f, 0.0f, 0.0f),
-                com.yandex.mapkit.Animation(com.yandex.mapkit.Animation.Type.SMOOTH, 0.5f),
+                Animation(Animation.Type.SMOOTH, 0.5f),
                 null
             )
-            binding.coordsText.text = String.format("%.6f, %.6f", coords.lat, coords.long)
 
-            MapKitFactory.getInstance().onStart()
-            mapView.onStart()
-
+            binding.coordsText.text = CoordinatesUtils.formatCoordinates(coords)
         } catch (e: Exception) {
             binding.mapContainer.isVisible = false
-        }
-    }
-    private fun openInBrowser(url: String) {
-        try {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-            startActivity(intent)
-        } catch (e: Exception) {
-            Toast.makeText(
-                requireContext(),
-                R.string.cannot_open_link,
-                Toast.LENGTH_SHORT
-            ).show()
         }
     }
     private fun showEventMenu(event: Event) {
@@ -297,12 +273,13 @@ class EventDetailFragment : Fragment() {
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> navigateToEditEvent(event.id)
-                    1 -> deleteEvent(event.id)
+                    1 -> confirmDeleteEvent(event.id)
                 }
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
     }
+
     private fun navigateToEditEvent(eventId: Long) {
         findNavController().navigate(
             R.id.newEventFragment,
@@ -311,7 +288,8 @@ class EventDetailFragment : Fragment() {
             }
         )
     }
-    private fun deleteEvent(eventId: Long) {
+
+    private fun confirmDeleteEvent(eventId: Long) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.delete_event)
             .setMessage(R.string.delete_event_confirmation)
@@ -321,6 +299,27 @@ class EventDetailFragment : Fragment() {
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
+    }
+
+    private fun showError(error: AppError) {
+        val message = when (error) {
+            is AppError.ApiError -> error.message ?: "Ошибка загрузки"
+            is AppError.NetworkError -> "Нет соединения с сетью"
+            is AppError.NotFoundError -> "Событие не найдено"
+            else -> error.message ?: "Неизвестная ошибка"
+        }
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setAction(R.string.retry) { loadEvent() }
+            .show()
+    }
+
+    private fun openInBrowser(url: String) {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), R.string.cannot_open_link, Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onStart() {

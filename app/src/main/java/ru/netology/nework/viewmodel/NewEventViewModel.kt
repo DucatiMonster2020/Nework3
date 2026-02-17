@@ -1,6 +1,5 @@
 package ru.netology.nework.viewmodel
 
-import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,7 +9,6 @@ import kotlinx.coroutines.launch
 import ru.netology.nework.api.ApiService
 import ru.netology.nework.dto.Event
 import ru.netology.nework.enumeration.EventType
-import ru.netology.nework.error.ApiError
 import ru.netology.nework.error.AppError
 import ru.netology.nework.utils.SingleLiveEvent
 import java.text.SimpleDateFormat
@@ -27,8 +25,8 @@ class NewEventViewModel @Inject constructor(
     private val _loading = MutableLiveData(false)
     val loading: LiveData<Boolean> = _loading
 
-    private val _error = SingleLiveEvent<AppError?>()
-    val error: LiveData<AppError?> = _error
+    private val _error = SingleLiveEvent<AppError>()
+    val error: LiveData<AppError> = _error
 
     private val _success = SingleLiveEvent<Boolean>()
     val success: LiveData<Boolean> = _success
@@ -38,14 +36,12 @@ class NewEventViewModel @Inject constructor(
         datetime: Date,
         isOnline: Boolean,
         link: String? = null,
-        attachmentUri: Uri? = null,
-        attachmentType: String? = null
+        coords: ru.netology.nework.dto.Coordinates? = null,
+        speakerIds: List<Long> = emptyList()
     ) {
         viewModelScope.launch {
             try {
                 _loading.value = true
-                _error.value = null
-                _success.value = false
 
                 val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
                 dateFormat.timeZone = TimeZone.getTimeZone("UTC")
@@ -60,11 +56,11 @@ class NewEventViewModel @Inject constructor(
                     content = content,
                     datetime = datetimeString,
                     published = "",
-                    coords = null,
+                    coords = coords,
                     type = if (isOnline) EventType.ONLINE else EventType.OFFLINE,
                     likeOwnerIds = emptyList(),
                     likedByMe = false,
-                    speakerIds = emptyList(),
+                    speakerIds = speakerIds,
                     participantsIds = emptyList(),
                     participatedByMe = false,
                     attachment = null,
@@ -77,7 +73,10 @@ class NewEventViewModel @Inject constructor(
                 if (response.isSuccessful) {
                     _success.value = true
                 } else {
-                    _error.value = ApiError("Ошибка создания события: ${response.code()}")
+                    when (response.code()) {
+                        400 -> _error.value = AppError.ValidationError("Ошибка валидации события")
+                        else -> _error.value = AppError.ApiError(response.code(), "Ошибка: ${response.code()}")
+                    }
                 }
             } catch (e: Exception) {
                 _error.value = AppError.fromThrowable(e)

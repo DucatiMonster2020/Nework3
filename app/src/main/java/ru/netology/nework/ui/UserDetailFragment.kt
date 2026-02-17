@@ -8,38 +8,24 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import ru.netology.nework.R
 import ru.netology.nework.adapter.UserProfilePagerAdapter
 import ru.netology.nework.auth.AppAuth
 import ru.netology.nework.databinding.FragmentUserDetailBinding
 import ru.netology.nework.dto.User
+import ru.netology.nework.error.AppError
+import ru.netology.nework.utils.Constants.ARG_IS_CURRENT_USER
+import ru.netology.nework.utils.Constants.ARG_USER_ID
 import ru.netology.nework.viewmodel.UserDetailViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class UserDetailFragment : Fragment() {
-
-    companion object {
-        private const val ARG_USER_ID = "user_id"
-        private const val ARG_IS_CURRENT_USER = "is_current_user"
-
-        fun newInstance(userId: Long, isCurrentUser: Boolean = false): UserDetailFragment {
-            return UserDetailFragment().apply {
-                arguments = Bundle().apply {
-                    putLong(ARG_USER_ID, userId)
-                    putBoolean(ARG_IS_CURRENT_USER, isCurrentUser)
-                }
-            }
-        }
-    }
 
     @Inject
     lateinit var appAuth: AppAuth
@@ -85,21 +71,15 @@ class UserDetailFragment : Fragment() {
             supportActionBar?.setDisplayShowHomeEnabled(true)
         }
         binding.toolbar.setNavigationOnClickListener {
-            if (!findNavController().popBackStack()) {
-                activity?.onBackPressed()
-            }
+            findNavController().popBackStack()
         }
     }
 
     private fun setupTabs() {
-        pagerAdapter = UserProfilePagerAdapter(
-            childFragmentManager,
-            lifecycle,
-            userId,
-            isCurrentUser
-        )
+        pagerAdapter = UserProfilePagerAdapter(this, userId, isCurrentUser)
         binding.viewPager.adapter = pagerAdapter
         binding.viewPager.offscreenPageLimit = 2
+
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = when (position) {
                 0 -> getString(R.string.wall_tab)
@@ -107,10 +87,6 @@ class UserDetailFragment : Fragment() {
                 else -> ""
             }
         }.attach()
-        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-            }
-        })
     }
 
     private fun setupObservers() {
@@ -128,24 +104,19 @@ class UserDetailFragment : Fragment() {
         }
 
         viewModel.error.observe(viewLifecycleOwner) { error ->
-            error?.let {
-                Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG)
-                    .setAction(R.string.retry) { loadUserData() }
-                    .show()
-            }
+            error?.let { showError(it) }
         }
     }
 
     private fun loadUserData() {
-        lifecycleScope.launch {
-            viewModel.loadUser(userId)
-        }
+        viewModel.loadUser(userId)
     }
 
     private fun updateUserInfo(user: User?) {
         user?.let {
             (activity as? AppCompatActivity)?.supportActionBar?.title = user.name
             binding.toolbar.subtitle = "@${user.login}"
+
             if (!user.avatar.isNullOrEmpty()) {
                 Glide.with(requireContext())
                     .load(user.avatar)
@@ -156,14 +127,22 @@ class UserDetailFragment : Fragment() {
             } else {
                 binding.userAvatar.setImageResource(R.drawable.author_avatar)
             }
+
             binding.userName.text = user.name
             binding.userLogin.text = "@${user.login}"
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        loadUserData()
+    private fun showError(error: AppError) {
+        val message = when (error) {
+            is AppError.ApiError -> error.message ?: "Ошибка загрузки"
+            is AppError.NetworkError -> "Нет соединения с сетью"
+            is AppError.NotFoundError -> "Пользователь не найден"
+            else -> error.message ?: "Неизвестная ошибка"
+        }
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setAction(R.string.retry) { loadUserData() }
+            .show()
     }
 
     override fun onDestroyView() {

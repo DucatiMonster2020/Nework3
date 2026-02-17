@@ -36,12 +36,11 @@ object FileUtils {
 
     fun getFileFromUri(uri: Uri): File? {
         return try {
-            // Для файловой схемы
             if (uri.scheme == "file") {
                 return File(uri.path ?: return null)
             }
 
-            null // В реальном проекте нужна реализация копирования файла
+            null
         } catch (e: Exception) {
             null
         }

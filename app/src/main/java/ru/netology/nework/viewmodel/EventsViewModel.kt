@@ -6,9 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import ru.netology.nework.error.AppError
 import ru.netology.nework.model.FeedModel
-import ru.netology.nework.model.FeedModelState
 import ru.netology.nework.repository.EventRepository
+import ru.netology.nework.utils.SingleLiveEvent
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,8 +20,8 @@ class EventsViewModel @Inject constructor(
     private val _dataState = MutableLiveData(FeedModel())
     val dataState: LiveData<FeedModel> = _dataState
 
-    private val _state = MutableLiveData<FeedModelState>(FeedModelState.IDLE)
-    val state: LiveData<FeedModelState> = _state
+    private val _error = SingleLiveEvent<AppError>()
+    val error: LiveData<AppError> = _error
 
     init {
         loadEvents()
@@ -29,15 +30,16 @@ class EventsViewModel @Inject constructor(
     fun loadEvents() {
         viewModelScope.launch {
             try {
-                _state.value = FeedModelState.LOADING
+                _dataState.value = _dataState.value?.copy(loading = true)
                 val events = repository.getAll()
                 _dataState.value = FeedModel(
                     events = events,
-                    empty = events.isEmpty()
+                    empty = events.isEmpty(),
+                    loading = false
                 )
-                _state.value = FeedModelState.IDLE
             } catch (e: Exception) {
-                _state.value = FeedModelState.error(e.message ?: "Unknown error")
+                _dataState.value = _dataState.value?.copy(loading = false)
+                _error.value = AppError.fromThrowable(e)
             }
         }
     }
@@ -45,15 +47,16 @@ class EventsViewModel @Inject constructor(
     fun refreshEvents() {
         viewModelScope.launch {
             try {
-                _state.value = FeedModelState.REFRESHING
+                _dataState.value = _dataState.value?.copy(refreshing = true)
                 val events = repository.getAll()
                 _dataState.value = FeedModel(
                     events = events,
-                    empty = events.isEmpty()
+                    empty = events.isEmpty(),
+                    refreshing = false
                 )
-                _state.value = FeedModelState.IDLE
             } catch (e: Exception) {
-                _state.value = FeedModelState.error(e.message ?: "Unknown error")
+                _dataState.value = _dataState.value?.copy(refreshing = false)
+                _error.value = AppError.fromThrowable(e)
             }
         }
     }
@@ -66,8 +69,7 @@ class EventsViewModel @Inject constructor(
                 val newEvents = currentEvents.map { if (it.id == id) event else it }
                 _dataState.value = _dataState.value?.copy(events = newEvents)
             } catch (e: Exception) {
-                _state.value = FeedModelState.error("Failed to like event")
-                loadEvents()
+                _error.value = AppError.fromThrowable(e)
             }
         }
     }
@@ -80,8 +82,7 @@ class EventsViewModel @Inject constructor(
                 val newEvents = currentEvents.map { if (it.id == id) event else it }
                 _dataState.value = _dataState.value?.copy(events = newEvents)
             } catch (e: Exception) {
-                _state.value = FeedModelState.error("Failed to dislike event")
-                loadEvents()
+                _error.value = AppError.fromThrowable(e)
             }
         }
     }
@@ -94,8 +95,7 @@ class EventsViewModel @Inject constructor(
                 val newEvents = currentEvents.map { if (it.id == id) event else it }
                 _dataState.value = _dataState.value?.copy(events = newEvents)
             } catch (e: Exception) {
-                _state.value = FeedModelState.error("Failed to participate")
-                loadEvents()
+                _error.value = AppError.fromThrowable(e)
             }
         }
     }
@@ -108,8 +108,7 @@ class EventsViewModel @Inject constructor(
                 val newEvents = currentEvents.map { if (it.id == id) event else it }
                 _dataState.value = _dataState.value?.copy(events = newEvents)
             } catch (e: Exception) {
-                _state.value = FeedModelState.error("Failed to cancel participation")
-                loadEvents()
+                _error.value = AppError.fromThrowable(e)
             }
         }
     }
@@ -122,7 +121,7 @@ class EventsViewModel @Inject constructor(
                 val newEvents = currentEvents.filter { it.id != id }
                 _dataState.value = _dataState.value?.copy(events = newEvents)
             } catch (e: Exception) {
-                _state.value = FeedModelState.error("Failed to delete event")
+                _error.value = AppError.fromThrowable(e)
                 loadEvents()
             }
         }

@@ -102,9 +102,12 @@
                 android:padding="12dp"
                 android:background="?attr/colorSurfaceVariant"
                 android:layout_marginBottom="16dp"
-                android:visibility="gone">
+                android:visibility="gone"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
+                    android:id="@+id/attachmentIcon"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_attachment_24"
@@ -122,14 +125,6 @@
                         android:layout_height="wrap_content"
                         android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/attachmentUrl"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textSize="12sp"
-                        android:textColor="?android:attr/textColorSecondary" />
-
                 </LinearLayout>
 
             </LinearLayout>
@@ -142,7 +137,9 @@
                 android:padding="12dp"
                 android:background="?attr/colorSurfaceVariant"
                 android:layout_marginBottom="16dp"
-                android:visibility="gone">
+                android:visibility="gone"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:layout_width="24dp"
@@ -165,13 +162,13 @@
                 android:orientation="horizontal"
                 android:layout_marginBottom="16dp">
 
-                <com.google.android.material.button.MaterialButton
+                <ImageButton
                     android:id="@+id/likeButton"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/ic_like_24"
-                    android:drawablePadding="4dp" />
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:src="@drawable/ic_like_24"
+                    android:contentDescription="@string/like" />
 
                 <TextView
                     android:id="@+id/likeCount"
@@ -182,40 +179,46 @@
 
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/mentionsTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mentioned_users"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/mentionsList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:visibility="gone" />
-
-            <LinearLayout
+            <FrameLayout
                 android:id="@+id/mapContainer"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:orientation="vertical"
-                android:background="?attr/colorSurfaceVariant"
                 android:layout_marginBottom="16dp"
                 android:visibility="gone">
 
-                <ImageView
+                <com.yandex.mapkit.mapview.MapView
+                    android:id="@+id/mapView"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/ic_map_placeholder"
-                    android:scaleType="centerCrop"
-                    android:contentDescription="@string/map" />
+                    android:layout_height="match_parent" />
 
                 <TextView
                     android:id="@+id/coordsText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
+                    android:layout_gravity="center|bottom"
                     android:layout_margin="8dp"
                     android:background="@android:color/white"
                     android:padding="8dp"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:elevation="4dp" />
 
-            </LinearLayout>
+            </FrameLayout>
 
         </LinearLayout>
 

@@ -107,9 +107,13 @@
     <string name="speakers">Спикеры</string>
     <string name="participants">Участники</string>
     <string name="loading_coords">Координаты загружаются…</string>
-
     <string name="confirm_location">Подтвердить местоположение</string>
     <string name="select_location_on_map">Выберите место на карте</string>
+    <string name="select_users">Выберите пользователей</string>
+    <string name="selected_users">Выбранные пользователи:</string>
+    <string name="confirm_selection">Подтвердить</string>
+    <string name="content_can_not_be_empty">Текст поста не может быть пустым</string>
+    <string name="select_location_button">Подтвердить выбор места</string>
 
 
     <string name="my_wall">Моя стена</string>
@@ -143,13 +147,11 @@
     <string name="date">Дата</string>
     <string name="attach_image">Добавить изображение</string>
     <string name="register">Зарегистрироваться</string>
-    <string name="select_users">Выберите пользователей</string>
     <string name="new_post">Новый пост</string>
     <string name="set_placemark">Установить метку</string>
     <string name="replace_attachment">Заменить вложение?</string>
     <string name="you_have_already_added_an_attachment">Вы уже добавили вложение. Если вы продолжите, текушее вложение будет удалено. Продолжить?</string>
     <string name="continue_action">Продолжить действие</string>
-    <string name="content_can_not_be_empty">Контент не может быть пустым</string>
     <string name="mentioned">Упоминаются</string>
     <string name="you">Вы</string>
     <string name="choose_users">Выберите пользователей</string>

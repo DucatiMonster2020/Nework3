@@ -1,5 +1,6 @@
 package ru.netology.nework.ui
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,19 +11,21 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import ru.netology.nework.R
 import ru.netology.nework.adapter.PostsAdapter
 import ru.netology.nework.auth.AppAuth
 import ru.netology.nework.databinding.FragmentUserWallBinding
 import ru.netology.nework.dto.Post
+import ru.netology.nework.error.AppError
+import ru.netology.nework.utils.Constants.ARG_IS_CURRENT_USER
+import ru.netology.nework.utils.Constants.ARG_POST_ID
+import ru.netology.nework.utils.Constants.ARG_USER_ID
 import ru.netology.nework.viewmodel.UserWallViewModel
 import javax.inject.Inject
 
@@ -30,9 +33,6 @@ import javax.inject.Inject
 class UserWallFragment : Fragment() {
 
     companion object {
-        private const val ARG_USER_ID = "user_id"
-        private const val ARG_IS_CURRENT_USER = "is_current_user"
-
         fun newInstance(userId: Long, isCurrentUser: Boolean = false): UserWallFragment {
             return UserWallFragment().apply {
                 arguments = Bundle().apply {
@@ -56,8 +56,12 @@ class UserWallFragment : Fragment() {
                 viewModel.likeById(post.id)
             },
             onItemClickListener = { post ->
-                // TODO: переход к деталям поста
-                showSnackbar("Пост ${post.id}")
+                findNavController().navigate(
+                    R.id.action_postsFragment_to_postDetailFragment,
+                    Bundle().apply {
+                        putLong(ARG_POST_ID, post.id)
+                    }
+                )
             },
             onMenuClickListener = { post ->
                 showPostMenu(post)
@@ -110,9 +114,7 @@ class UserWallFragment : Fragment() {
         }
 
         binding.toolbar.setNavigationOnClickListener {
-            if (!findNavController().popBackStack()) {
-                activity?.onBackPressed()
-            }
+            findNavController().popBackStack()
         }
     }
 
@@ -127,27 +129,22 @@ class UserWallFragment : Fragment() {
             binding.emptyState.isVisible = posts.isEmpty()
             binding.postsList.isVisible = posts.isNotEmpty()
         }
+
         viewModel.user.observe(viewLifecycleOwner) { user ->
-            user?.let {
-                updateUserInfo(it)
-            }
+            user?.let { updateUserInfo(it) }
         }
 
         viewModel.lastJob.observe(viewLifecycleOwner) { job ->
             binding.userJob.text = job ?: getString(R.string.looking_for_job)
         }
+
         viewModel.loading.observe(viewLifecycleOwner) { loading ->
             binding.progressBar.isVisible = loading
             binding.swipeRefresh.isRefreshing = loading
-
-            if (!loading) {
-                binding.swipeRefresh.isRefreshing = false
-            }
         }
+
         viewModel.error.observe(viewLifecycleOwner) { error ->
-            error?.let {
-                showError(it)
-            }
+            error?.let { showError(it) }
         }
     }
 
@@ -158,7 +155,8 @@ class UserWallFragment : Fragment() {
         binding.fab.apply {
             isVisible = isCurrentUser
             setOnClickListener {
-                if (appAuth.authState.value?.id != 0L) {
+                val authState = appAuth.authState.value
+                if (authState?.id != 0L) {
                     navigateToCreatePost()
                 } else {
                     showLoginRequiredDialog()
@@ -172,15 +170,11 @@ class UserWallFragment : Fragment() {
     }
 
     private fun loadUserWall() {
-        lifecycleScope.launch {
-            viewModel.loadUserWall(userId)
-        }
+        viewModel.loadUserWall(userId)
     }
 
     private fun refreshUserWall() {
-        lifecycleScope.launch {
-            viewModel.refreshUserWall(userId)
-        }
+        viewModel.refreshUserWall(userId)
     }
 
     private fun updateUserInfo(user: ru.netology.nework.dto.User) {
@@ -188,6 +182,7 @@ class UserWallFragment : Fragment() {
             (activity as? AppCompatActivity)?.supportActionBar?.title = user.name
             binding.toolbar.subtitle = "@${user.login}"
         }
+
         if (!user.avatar.isNullOrEmpty()) {
             Glide.with(requireContext())
                 .load(user.avatar)
@@ -198,6 +193,7 @@ class UserWallFragment : Fragment() {
         } else {
             binding.userAvatar.setImageResource(R.drawable.author_avatar)
         }
+
         binding.userName.text = user.name
         binding.userLogin.text = "@${user.login}"
     }
@@ -214,12 +210,23 @@ class UserWallFragment : Fragment() {
                 )) { _, which ->
                     when (which) {
                         0 -> navigateToEditPost(post.id)
-                        1 -> deletePost(post.id)
+                        1 -> confirmDeletePost(post.id)
                     }
                 }
                 .setNegativeButton(R.string.cancel, null)
                 .show()
         }
+    }
+
+    private fun confirmDeletePost(postId: Long) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.delete_post)
+            .setMessage(R.string.delete_post_confirmation)
+            .setPositiveButton(R.string.delete) { _, _ ->
+                viewModel.deletePost(postId)
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     private fun showLoginRequiredDialog() {
@@ -237,52 +244,41 @@ class UserWallFragment : Fragment() {
     }
 
     private fun navigateToCreatePost() {
-        showSnackbar("Создать новый пост")
+        findNavController().navigate(
+            R.id.action_global_newPostFragment,
+            Bundle().apply {
+                putLong(ARG_POST_ID, 0L)
+            }
+        )
     }
 
     private fun navigateToEditPost(postId: Long) {
-        showSnackbar("Редактировать пост $postId")
-    }
-
-    private fun deletePost(postId: Long) {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.delete_post)
-            .setMessage(R.string.delete_post_confirmation)
-            .setPositiveButton(R.string.delete) { _, _ ->
-                viewModel.deletePost(postId)
+        findNavController().navigate(
+            R.id.action_global_newPostFragment,
+            Bundle().apply {
+                putLong(ARG_POST_ID, postId)
             }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
+        )
     }
 
     private fun openLinkInBrowser(url: String) {
         try {
-            val intent = android.content.Intent(
-                android.content.Intent.ACTION_VIEW,
-                Uri.parse(url)
-            )
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(intent)
         } catch (e: Exception) {
-            Toast.makeText(
-                requireContext(),
-                R.string.cannot_open_link,
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(requireContext(), R.string.cannot_open_link, Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun showError(message: String) {
-        if (isAdded) {
-            Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
-                .setAction(R.string.retry) { loadUserWall() }
-                .show()
+    private fun showError(error: AppError) {
+        val message = when (error) {
+            is AppError.ApiError -> error.message ?: "Ошибка API"
+            is AppError.NetworkError -> "Нет соединения с сетью"
+            else -> error.message ?: "Неизвестная ошибка"
         }
-    }
-
-    private fun showSnackbar(message: String) {
-        if (isAdded) {
-            Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
-        }
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setAction(R.string.retry) { loadUserWall() }
+            .show()
     }
 
     override fun onResume() {

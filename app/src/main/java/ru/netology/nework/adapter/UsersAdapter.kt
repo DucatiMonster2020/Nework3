@@ -1,9 +1,8 @@
 package ru.netology.nework.adapter
 
-import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -13,8 +12,10 @@ import ru.netology.nework.databinding.CardUserBinding
 import ru.netology.nework.dto.User
 
 class UsersAdapter(
-    private val onItemClickListener: (User) -> Unit = {}
-) : ListAdapter<User, UsersAdapter.UserViewHolder>(UserDiffCallback()) {
+    private val onItemClickListener: (User) -> Unit,
+    private val isSelectionMode: Boolean = false,
+    private var selectedIds: Set<Long> = emptySet()
+) : ListAdapter<User, UsersAdapter.UserViewHolder>(UsersDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
         val binding = CardUserBinding.inflate(
@@ -22,48 +23,72 @@ class UsersAdapter(
             parent,
             false
         )
-        return UserViewHolder(binding, onItemClickListener)
+        return UserViewHolder(binding, onItemClickListener, isSelectionMode)
     }
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        val user = getItem(position)
+        val isSelected = selectedIds.contains(user.id)
+        holder.bind(user, isSelected)
+    }
+
+    fun updateSelectedIds(newSelectedIds: Set<Long>) {
+        selectedIds = newSelectedIds
+        notifyItemRangeChanged(0, itemCount)
     }
 
     class UserViewHolder(
         private val binding: CardUserBinding,
-        private val onItemClickListener: (User) -> Unit
+        private val onItemClickListener: (User) -> Unit,
+        private val isSelectionMode: Boolean
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(user: User) {
+        private var currentUser: User? = null
+
+        init {
+            binding.root.setOnClickListener {
+                currentUser?.let { user ->
+                    if (isSelectionMode) {
+                        binding.selectionIndicator.performClick()
+                    } else {
+                        onItemClickListener(user)
+                    }
+                }
+            }
+        }
+
+        fun bind(user: User, isSelected: Boolean) {
+            currentUser = user
+
             binding.apply {
+                userName.text = user.name
+                userLogin.text = "@${user.login}"
+
                 if (!user.avatar.isNullOrEmpty()) {
-                    Glide.with(userAvatar)
-                        .load(user.avatar)
-                        .circleCrop()
+                    Glide.with(binding.root)
+                        .load(user.avatar).circleCrop()
                         .placeholder(R.drawable.author_avatar)
-                        .error(android.R.drawable.ic_menu_gallery)
+                        .error(R.drawable.author_avatar)
                         .into(userAvatar)
                 } else {
                     userAvatar.setImageResource(R.drawable.author_avatar)
                 }
-                userName.text = user.name
-                userName.typeface = Typeface.DEFAULT_BOLD
-                userLogin.text = "@${user.login}"
-                userLogin.setTextColor(ContextCompat.getColor(itemView.context, android.R.color.darker_gray))
-                root.setOnClickListener {
-                    onItemClickListener(user)
+                selectionIndicator.isVisible = isSelectionMode
+
+                if (isSelectionMode) {
+                    selectionIndicator.isChecked = isSelected
                 }
             }
         }
     }
-}
 
-class UserDiffCallback : DiffUtil.ItemCallback<User>() {
-    override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
-        return oldItem.id == newItem.id
-    }
+    class UsersDiffCallback : DiffUtil.ItemCallback<User>() {
+        override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
+            return oldItem.id == newItem.id
+        }
 
-    override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
-        return oldItem == newItem
+        override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
+            return oldItem == newItem
+        }
     }
 }

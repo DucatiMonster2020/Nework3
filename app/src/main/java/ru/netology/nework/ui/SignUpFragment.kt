@@ -1,5 +1,6 @@
 package ru.netology.nework.ui
 
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,13 +15,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.netology.nework.R
 import ru.netology.nework.databinding.FragmentSignUpBinding
-import ru.netology.nework.error.ApiError
-import ru.netology.nework.error.NetworkError
-import ru.netology.nework.error.ValidationError
+import ru.netology.nework.error.AppError
+import ru.netology.nework.utils.Constants.ERROR_USER_ALREADY_EXISTS
+import ru.netology.nework.utils.Constants.MAX_IMAGE_SIZE
 import ru.netology.nework.viewmodel.SignUpViewModel
 
 @AndroidEntryPoint
@@ -29,21 +31,16 @@ class SignUpFragment : Fragment() {
     private val viewModel by viewModels<SignUpViewModel>()
     private var _binding: FragmentSignUpBinding? = null
     private val binding get() = _binding!!
+
     private var selectedImageUri: Uri? = null
 
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            if (validateImageFormat(it)) {
+            if (validateImage(it)) {
                 selectedImageUri = it
-                loadImage(it)
-            } else {
-                Snackbar.make(
-                    binding.root,
-                    "Формат должен быть JPG или PNG, размер до 2048x2048",
-                    Snackbar.LENGTH_LONG
-                ).show()
+                loadImagePreview(it)
             }
         }
     }
@@ -76,15 +73,7 @@ class SignUpFragment : Fragment() {
         }
 
         viewModel.error.observe(viewLifecycleOwner) { error ->
-            error?.let {
-                val message = when (it) {
-                    is ApiError -> it.message ?: "Ошибка API"
-                    is NetworkError -> "Нет соединения с сетью"
-                    is ValidationError -> "Ошибка валидации данных"
-                    else -> "Неизвестная ошибка"
-                }
-                Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
-            }
+            error?.let { showError(it) }
         }
 
         viewModel.success.observe(viewLifecycleOwner) { success ->
@@ -131,10 +120,6 @@ class SignUpFragment : Fragment() {
             binding.passwordConfirmInput.error = "Пароли не совпадают"
             return
         }
-        if (selectedImageUri == null) {
-            Snackbar.make(binding.root, "Выберите аватар", Snackbar.LENGTH_SHORT).show()
-            return
-        }
 
         lifecycleScope.launch {
             viewModel.signUp(
@@ -147,12 +132,58 @@ class SignUpFragment : Fragment() {
         }
     }
 
-    private fun validateImageFormat(uri: Uri): Boolean {
+    private fun validateImage(uri: Uri): Boolean {
         return try {
             val mimeType = requireContext().contentResolver.getType(uri)
-            mimeType in arrayOf("image/jpeg", "image/png", "image/jpg")
+            val isValidFormat = mimeType in arrayOf("image/jpeg", "image/png", "image/jpg")
+
+            if (!isValidFormat) {
+                Snackbar.make(
+                    binding.root,
+                    "Поддерживаются только форматы JPG и PNG",
+                    Snackbar.LENGTH_LONG
+                ).show()
+                return false
+            }
+
+            val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            requireContext().contentResolver.openInputStream(uri)?.use { stream ->
+                BitmapFactory.decodeStream(stream, null, options)
+            }
+
+            val width = options.outWidth
+            val height = options.outHeight
+
+            if (width > MAX_IMAGE_SIZE || height > MAX_IMAGE_SIZE) {
+                Snackbar.make(
+                    binding.root,
+                    "Размер изображения не должен превышать 2048x2048 пикселей",
+                    Snackbar.LENGTH_LONG
+                ).show()
+                return false
+            }
+
+            true
         } catch (e: Exception) {
+            showError(AppError.fromThrowable(e))
             false
+        }
+    }
+
+    private fun loadImagePreview(uri: Uri) {
+        try {
+            Glide.with(this)
+                .load(uri)
+                .circleCrop()
+                .placeholder(R.drawable.author_avatar)
+                .error(R.drawable.author_avatar)
+                .into(binding.avatarImage)
+
+            binding.avatarImage.isVisible = true
+            binding.avatarButton.text = "Изменить аватар"
+
+        } catch (e: Exception) {
+            showError(AppError.fromThrowable(e))
         }
     }
 
@@ -163,7 +194,7 @@ class SignUpFragment : Fragment() {
                 validateField(binding.passwordConfirmInput)
     }
 
-    private fun validateField(inputLayout: com.google.android.material.textfield.TextInputLayout): Boolean {
+    private fun validateField(inputLayout: TextInputLayout): Boolean {
         val text = inputLayout.editText?.text.toString().trim()
 
         return when (inputLayout.id) {
@@ -207,20 +238,20 @@ class SignUpFragment : Fragment() {
         }
     }
 
-    private fun loadImage(uri: Uri) {
-        try {
-            Glide.with(this)
-                .load(uri)
-                .circleCrop()
-                .placeholder(R.drawable.author_avatar)
-                .into(binding.avatarImage)
-
-            binding.avatarImage.isVisible = true
-            binding.avatarButton.text = "Изменить аватар"
-
-        } catch (e: Exception) {
-            Toast.makeText(requireContext(), "Ошибка загрузки изображения", Toast.LENGTH_SHORT).show()
+    private fun showError(error: AppError) {
+        val message = when (error) {
+            is AppError.ApiError -> {
+                if (error.message == ERROR_USER_ALREADY_EXISTS) {
+                    error.message
+                } else {
+                    error.message ?: "Ошибка сервера"
+                }
+            }
+            is AppError.NetworkError -> "Нет соединения с сетью"
+            is AppError.ValidationError -> "Ошибка валидации"
+            else -> error.message ?: "Неизвестная ошибка"
         }
+        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
     }
 
     override fun onDestroyView() {

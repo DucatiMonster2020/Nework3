@@ -1,9 +1,9 @@
 package ru.netology.nework.ui
 
+
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,19 +11,16 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import ru.netology.nework.BuildConfig
 import ru.netology.nework.R
 import ru.netology.nework.adapter.UsersAdapter
@@ -31,22 +28,15 @@ import ru.netology.nework.databinding.FragmentPostDetailBinding
 import ru.netology.nework.dto.Coordinates
 import ru.netology.nework.dto.Post
 import ru.netology.nework.enumeration.AttachmentType
+import ru.netology.nework.error.AppError
+import ru.netology.nework.utils.Constants.ARG_IS_CURRENT_USER
+import ru.netology.nework.utils.Constants.ARG_POST_ID
+import ru.netology.nework.utils.Constants.ARG_USER_ID
+import ru.netology.nework.utils.CoordinatesUtils
 import ru.netology.nework.viewmodel.PostDetailViewModel
 
 @AndroidEntryPoint
 class PostDetailFragment : Fragment() {
-
-    companion object {
-        private const val ARG_POST_ID = "post_id"
-
-        fun newInstance(postId: Long): PostDetailFragment {
-            return PostDetailFragment().apply {
-                arguments = Bundle().apply {
-                    putLong(ARG_POST_ID, postId)
-                }
-            }
-        }
-    }
 
     private val viewModel by viewModels<PostDetailViewModel>()
     private var _binding: FragmentPostDetailBinding? = null
@@ -55,9 +45,11 @@ class PostDetailFragment : Fragment() {
     private val mentionsAdapter by lazy {
         UsersAdapter(
             onItemClickListener = { user ->
-                findNavController().navigate(R.id.action_global_userDetailFragment,
+                findNavController().navigate(
+                    R.id.action_global_userDetailFragment,
                     Bundle().apply {
-                        putLong("userId", user.id)
+                        putLong(ARG_USER_ID, user.id)
+                        putBoolean(ARG_IS_CURRENT_USER, false)
                     }
                 )
             }
@@ -77,6 +69,8 @@ class PostDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        MapKitFactory.setApiKey(BuildConfig.YANDEX_MAPS_API_KEY)
 
         setupToolbar()
         setupMentionsList()
@@ -98,18 +92,18 @@ class PostDetailFragment : Fragment() {
             false
         )
         binding.mentionsList.adapter = mentionsAdapter
+        binding.mentionsTitle.isVisible = false
     }
 
     private fun setupObservers() {
         viewModel.post.observe(viewLifecycleOwner) { post ->
-            post?.let {
-                updatePostInfo(it)
-            }
+            post?.let { updatePostInfo(it) }
         }
 
         viewModel.mentionedUsers.observe(viewLifecycleOwner) { users ->
             mentionsAdapter.submitList(users)
             binding.mentionsList.isVisible = users.isNotEmpty()
+            binding.mentionsTitle.isVisible = users.isNotEmpty()
         }
 
         viewModel.loading.observe(viewLifecycleOwner) { loading ->
@@ -118,11 +112,7 @@ class PostDetailFragment : Fragment() {
         }
 
         viewModel.error.observe(viewLifecycleOwner) { error ->
-            error?.let {
-                Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG)
-                    .setAction(R.string.retry) { loadPost() }
-                    .show()
-            }
+            error?.let { showError(it) }
         }
     }
 
@@ -135,7 +125,9 @@ class PostDetailFragment : Fragment() {
 
         binding.menuButton.setOnClickListener {
             viewModel.post.value?.let { post ->
-                showPostMenu(post)
+                if (post.ownedByMe) {
+                    showPostMenu(post)
+                }
             }
         }
 
@@ -155,9 +147,7 @@ class PostDetailFragment : Fragment() {
     private fun loadPost() {
         val postId = arguments?.getLong(ARG_POST_ID) ?: 0L
         if (postId != 0L) {
-            lifecycleScope.launch {
-                viewModel.loadPost(postId)
-            }
+            viewModel.loadPost(postId)
         } else {
             findNavController().popBackStack()
         }
@@ -165,106 +155,70 @@ class PostDetailFragment : Fragment() {
 
     private fun updatePostInfo(post: Post) {
         binding.toolbar.title = "Пост от ${post.author}"
+
         if (!post.authorAvatar.isNullOrEmpty()) {
             Glide.with(requireContext())
                 .load(post.authorAvatar)
                 .circleCrop()
                 .placeholder(R.drawable.author_avatar)
+                .error(R.drawable.author_avatar)
                 .into(binding.authorAvatar)
         } else {
             binding.authorAvatar.setImageResource(R.drawable.author_avatar)
         }
+
         binding.authorName.text = post.author
         binding.publishedTime.text = post.formattedDate
         binding.authorJob.text = post.authorJob ?: getString(R.string.looking_for_job)
         binding.content.text = post.content
+
         binding.likeCount.text = post.likeOwnerIds.size.toString()
-        val likeIcon = if (post.likedByMe) {
-            R.drawable.ic_like_filled_24
-        } else {
-            R.drawable.ic_like_24
-        }
-        binding.likeButton.setImageResource(likeIcon)
+        binding.likeButton.setImageResource(
+            if (post.likedByMe) R.drawable.ic_like_filled_24 else R.drawable.ic_like_24
+        )
 
-        val hasAttachment = post.attachment != null
-        binding.attachmentContainer.isVisible = hasAttachment
-
-        if (hasAttachment) {
-            post.attachment?.let { attachment ->
-                binding.attachmentType.text = when (attachment.type) {
-                    AttachmentType.IMAGE -> "Фото"
-                    AttachmentType.VIDEO -> "Видео"
-                    AttachmentType.AUDIO -> "Аудио"
-                }
-                binding.attachmentUrl.text = attachment.url
+        binding.attachmentContainer.isVisible = post.attachment != null
+        post.attachment?.let { attachment ->
+            binding.attachmentType.text = when (attachment.type) {
+                AttachmentType.IMAGE -> "Фото"
+                AttachmentType.VIDEO -> "Видео"
+                AttachmentType.AUDIO -> "Аудио"
             }
         }
 
-        val hasLink = !post.link.isNullOrEmpty()
-        binding.linkContainer.isVisible = hasLink
+        binding.linkContainer.isVisible = !post.link.isNullOrEmpty()
+        binding.linkText.text = post.link
 
-        if (hasLink) {
-            binding.linkText.text = post.link
+        binding.mapContainer.isVisible = post.coords != null
+        if (post.coords != null && !isMapInitialized) {
+            showMap(post.coords)
+            isMapInitialized = true
+            binding.coordsText.text = CoordinatesUtils.formatCoordinates(post.coords)
         }
-        val hasCoords = post.coords != null
-        binding.mapContainer.isVisible = hasCoords
 
-        if (hasCoords && !isMapInitialized) {
-            post.coords?.let { coords ->
-                showMap(coords)
-                isMapInitialized = true
-            }
-        }
         binding.menuButton.isVisible = post.ownedByMe
     }
 
     private fun showMap(coords: Coordinates) {
         try {
-            MapKitFactory.setApiKey(BuildConfig.YANDEX_MAPS_API_KEY)
-            MapKitFactory.initialize(requireContext())
-
-            val mapView = binding.mapView
-            val map = mapView.mapWindow.map
             val point = Point(coords.lat, coords.long)
-            val mapObjects = map.mapObjects.addCollection()
-            mapObjects.addPlacemark().apply {
-                geometry = point
-                setIcon(
-                    ImageProvider.fromResource(requireContext(), R.drawable.ic_map_pin)
-                )
-                opacity = 1.0f
-            }
+            val map = binding.mapView.mapWindow.map
+
+            map.mapObjects.clear()
+            map.mapObjects.addPlacemark(point,
+                ImageProvider.fromResource(requireContext(), R.drawable.ic_map_pin)
+            )
             map.move(
                 CameraPosition(point, 15.0f, 0.0f, 0.0f),
                 Animation(Animation.Type.SMOOTH, 0f),
                 null
             )
+            map.isScrollGesturesEnabled = false
+            map.isZoomGesturesEnabled = false
 
-            mapView.mapWindow.map.isScrollGesturesEnabled = false
-            mapView.mapWindow.map.isZoomGesturesEnabled = false
-            mapView.mapWindow.map.isRotateGesturesEnabled = false
-            mapView.mapWindow.map.isTiltGesturesEnabled = false
-
-            binding.coordsText.text = String.format("%.6f, %.6f", coords.lat, coords.long)
-            MapKitFactory.getInstance().onStart()
-            mapView.onStart()
-
+            binding.mapView.onStart()
         } catch (e: Exception) {
-            binding.mapContainer.visibility = View.GONE
-            Log.e("PostDetailFragment", "Ошибка инициализации карты", e)
-        }
-    }
-
-    private fun openInBrowser(url: String) {
-        try {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-            startActivity(intent)
-        } catch (e: Exception) {
-            Toast.makeText(
-                requireContext(),
-                R.string.cannot_open_link,
-                Toast.LENGTH_SHORT
-            ).show()
+            binding.mapContainer.isVisible = false
         }
     }
 
@@ -279,17 +233,23 @@ class PostDetailFragment : Fragment() {
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> navigateToEditPost(post.id)
-                    1 -> deletePost(post.id)
+                    1 -> confirmDeletePost(post.id)
                 }
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
     }
+
     private fun navigateToEditPost(postId: Long) {
-        Snackbar.make(binding.root, "Редактирование поста $postId", Snackbar.LENGTH_SHORT).show()
+        findNavController().navigate(
+            R.id.action_global_newPostFragment,
+            Bundle().apply {
+                putLong(ARG_POST_ID, postId)
+            }
+        )
     }
 
-    private fun deletePost(postId: Long) {
+    private fun confirmDeletePost(postId: Long) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.delete_post)
             .setMessage(R.string.delete_post_confirmation)
@@ -301,18 +261,35 @@ class PostDetailFragment : Fragment() {
             .show()
     }
 
+    private fun showError(error: AppError) {
+        val message = when (error) {
+            is AppError.ApiError -> error.message ?: "Ошибка загрузки"
+            is AppError.NetworkError -> "Нет соединения с сетью"
+            is AppError.NotFoundError -> "Пост не найден"
+            else -> error.message ?: "Неизвестная ошибка"
+        }
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun openInBrowser(url: String) {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), R.string.cannot_open_link, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun onStart() {
         super.onStart()
-        if (binding.mapContainer.visibility == View.VISIBLE && isMapInitialized) {
-            MapKitFactory.getInstance().onStart()
+        if (binding.mapContainer.isVisible && isMapInitialized) {
             binding.mapView.onStart()
         }
     }
 
     override fun onStop() {
-        if (binding.mapContainer.visibility == View.VISIBLE && isMapInitialized) {
+        if (binding.mapContainer.isVisible && isMapInitialized) {
             binding.mapView.onStop()
-            MapKitFactory.getInstance().onStop()
         }
         super.onStop()
     }

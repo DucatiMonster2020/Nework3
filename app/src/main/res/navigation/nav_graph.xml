@@ -105,6 +105,10 @@
             app:popUpTo="@id/postsFragment"
             app:popUpToInclusive="true" />
 
+        <action
+            android:id="@+id/action_newPostFragment_to_mapFragment"
+            app:destination="@+id/mapFragment" />
+
         <argument
             android:name="postId"
             app:argType="long"
@@ -117,6 +121,10 @@
         android:name="ru.netology.nework.ui.NewEventFragment"
         android:label="Новое событие"
         tools:layout="@layout/fragment_new_event">
+
+        <action
+            android:id="@+id/action_newEventFragment_to_mapFragment"
+            app:destination="@+id/mapFragment" />
 
         <action
             android:id="@+id/action_newEventFragment_to_eventsFragment"
@@ -240,5 +248,14 @@
         app:destination="@id/myProfileFragment"
         app:popUpTo="@id/nav_graph"
         app:popUpToInclusive="false" />
+    <action
+        android:id="@+id/action_global_newPostFragment"
+        app:destination="@+id/newPostFragment">
+
+        <argument
+            android:name="postId"
+            app:argType="long"
+            android:defaultValue="0" />
+    </action>
 
 </navigation>

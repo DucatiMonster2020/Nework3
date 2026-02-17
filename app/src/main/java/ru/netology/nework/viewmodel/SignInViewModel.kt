@@ -8,8 +8,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import ru.netology.nework.api.ApiService
 import ru.netology.nework.auth.AppAuth
-import ru.netology.nework.error.ApiError
 import ru.netology.nework.error.AppError
+import ru.netology.nework.utils.Constants
 import ru.netology.nework.utils.SingleLiveEvent
 import javax.inject.Inject
 
@@ -22,8 +22,8 @@ class SignInViewModel @Inject constructor(
     private val _loading = MutableLiveData(false)
     val loading: LiveData<Boolean> = _loading
 
-    private val _error = SingleLiveEvent<AppError?>()
-    val error: LiveData<AppError?> = _error
+    private val _error = SingleLiveEvent<AppError>()
+    val error: LiveData<AppError> = _error
 
     private val _success = SingleLiveEvent<Boolean>()
     val success: LiveData<Boolean> = _success
@@ -32,8 +32,6 @@ class SignInViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _loading.value = true
-                _error.value = null
-                _success.value = false
 
                 val response = apiService.authenticateUser(login, password)
 
@@ -43,12 +41,14 @@ class SignInViewModel @Inject constructor(
                         appAuth.setAuth(it)
                         _success.value = true
                     } ?: run {
-                        _error.value = ApiError("Ошибка авторизации")
+                        _error.value = AppError.ApiError(null, "Ошибка авторизации")
                     }
                 } else {
                     when (response.code()) {
-                        400 -> _error.value = ApiError("Неправильный логин или пароль")
-                        else -> _error.value = ApiError("Ошибка: ${response.code()}")
+                        400 -> _error.value =
+                            AppError.ApiError(400, Constants.ERROR_INVALID_LOGIN_PASSWORD)
+                        else -> _error.value =
+                            AppError.ApiError(response.code(), "Ошибка: ${response.code()}")
                     }
                 }
             } catch (e: Exception) {

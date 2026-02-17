@@ -17,11 +17,8 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import ru.netology.nework.api.ApiService
 import ru.netology.nework.auth.AppAuth
-import ru.netology.nework.error.ApiError
 import ru.netology.nework.error.AppError
 import ru.netology.nework.utils.Constants
-import ru.netology.nework.utils.Constants.MAX_FILE_SIZE
-import ru.netology.nework.utils.Constants.MAX_IMAGE_SIZE
 import ru.netology.nework.utils.SingleLiveEvent
 import java.io.File
 import java.io.FileOutputStream
@@ -36,8 +33,8 @@ class SignUpViewModel @Inject constructor(
     private val _loading = MutableLiveData(false)
     val loading: LiveData<Boolean> = _loading
 
-    private val _error = SingleLiveEvent<AppError?>()
-    val error: LiveData<AppError?> = _error
+    private val _error = SingleLiveEvent<AppError>()
+    val error: LiveData<AppError> = _error
 
     private val _success = SingleLiveEvent<Boolean>()
     val success: LiveData<Boolean> = _success
@@ -52,11 +49,8 @@ class SignUpViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _loading.value = true
-                _error.value = null
-                _success.value = false
-
                 if (avatarUri == null) {
-                    _error.value = ApiError("Аватар обязателен")
+                    _error.value = AppError.ValidationError("Аватар обязателен")
                     return@launch
                 }
 
@@ -65,7 +59,7 @@ class SignUpViewModel @Inject constructor(
                 }
 
                 if (filePart == null) {
-                    _error.value = ApiError("Неверный формат или размер аватара")
+                    _error.value = AppError.ValidationError("Неверный формат или размер аватара")
                     return@launch
                 }
 
@@ -86,12 +80,14 @@ class SignUpViewModel @Inject constructor(
                         appAuth.setAuth(it)
                         _success.value = true
                     } ?: run {
-                        _error.value = ApiError("Ошибка регистрации")
+                        _error.value = AppError.ApiError(null, "Ошибка регистрации")
                     }
                 } else {
                     when (response.code()) {
-                        400 -> _error.value = ApiError(Constants.ERROR_USER_ALREADY_EXISTS)
-                        else -> _error.value = ApiError("Ошибка: ${response.code()}")
+                        400 -> _error.value =
+                            AppError.ApiError(400, Constants.ERROR_USER_ALREADY_EXISTS)
+                        else -> _error.value =
+                            AppError.ApiError(response.code(), "Ошибка: ${response.code()}")
                     }
                 }
             } catch (e: Exception) {
@@ -109,7 +105,6 @@ class SignUpViewModel @Inject constructor(
             if (!isValidFormat) {
                 return null
             }
-
             val options = BitmapFactory.Options().apply {
                 inJustDecodeBounds = true
             }
@@ -120,12 +115,11 @@ class SignUpViewModel @Inject constructor(
             val width = options.outWidth
             val height = options.outHeight
 
-            if (width > MAX_IMAGE_SIZE || height > MAX_IMAGE_SIZE) {
+            if (width > Constants.MAX_IMAGE_SIZE || height > Constants.MAX_IMAGE_SIZE) {
                 return null
             }
-
             val fileSize = getFileSize(context, uri)
-            if (fileSize > MAX_FILE_SIZE) {
+            if (fileSize > Constants.MAX_FILE_SIZE) {
                 return null
             }
 
@@ -159,7 +153,6 @@ class SignUpViewModel @Inject constructor(
             0L
         }
     }
-
     private fun getExtension(mimeType: String?): String {
         return when (mimeType) {
             "image/jpeg", "image/jpg" -> "jpg"

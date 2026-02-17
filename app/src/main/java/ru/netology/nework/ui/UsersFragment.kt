@@ -7,15 +7,16 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import ru.netology.nework.R
 import ru.netology.nework.adapter.UsersAdapter
 import ru.netology.nework.databinding.FragmentUsersBinding
+import ru.netology.nework.error.AppError
+import ru.netology.nework.utils.Constants.ARG_IS_CURRENT_USER
+import ru.netology.nework.utils.Constants.ARG_USER_ID
 import ru.netology.nework.viewmodel.UsersViewModel
 
 @AndroidEntryPoint
@@ -31,8 +32,8 @@ class UsersFragment : Fragment() {
                 findNavController().navigate(
                     R.id.action_usersFragment_to_userDetailFragment,
                     Bundle().apply {
-                        putLong("userId", user.id)
-                        putBoolean("isCurrentUser", false)
+                        putLong(ARG_USER_ID, user.id)
+                        putBoolean(ARG_IS_CURRENT_USER, false)
                     }
                 )
             }
@@ -63,22 +64,17 @@ class UsersFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.users.observe(viewLifecycleOwner) { users ->
-            adapter.submitList(users)
-            if (users.isEmpty()) {
-                binding.usersList.isVisible = false
-            } else {
-                binding.usersList.isVisible = true
+        viewModel.dataState.observe(viewLifecycleOwner) { state ->
+            adapter.submitList(state.users)
+            binding.usersList.isVisible = state.users.isNotEmpty()
+            binding.progressBar.isVisible = state.loading && !state.refreshing
+            binding.swipeRefresh.isRefreshing = state.refreshing
+            if (state.error != null) {
+                showError(state.error)
             }
         }
-
-        viewModel.state.observe(viewLifecycleOwner) { state ->
-            binding.progressBar.isVisible = state.loading
-            binding.swipeRefresh.isRefreshing = state.refreshing
-
-            if (state.error && state.errorMessage != null) {
-                showError(state.errorMessage)
-            }
+        viewModel.error.observe(viewLifecycleOwner) { error ->
+            error?.let { showError(it) }
         }
     }
 
@@ -89,18 +85,19 @@ class UsersFragment : Fragment() {
     }
 
     private fun loadUsers() {
-        lifecycleScope.launch {
-            viewModel.loadUsers()
-        }
+        viewModel.loadUsers()
     }
 
     private fun refreshUsers() {
-        lifecycleScope.launch {
-            viewModel.refreshUsers()
-        }
+        viewModel.refreshUsers()
     }
 
-    private fun showError(message: String) {
+    private fun showError(error: AppError) {
+        val message = when (error) {
+            is AppError.ApiError -> error.message ?: "Ошибка загрузки"
+            is AppError.NetworkError -> "Нет соединения с сетью"
+            else -> error.message ?: "Неизвестная ошибка"
+        }
         Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
             .setAction(R.string.retry) { loadUsers() }
             .show()

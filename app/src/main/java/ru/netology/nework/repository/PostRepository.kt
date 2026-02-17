@@ -1,5 +1,6 @@
 package ru.netology.nework.repository
 
+import retrofit2.HttpException
 import ru.netology.nework.api.ApiService
 import ru.netology.nework.dto.Post
 import ru.netology.nework.error.AppError
@@ -15,7 +16,7 @@ class PostRepository @Inject constructor(
             val response = apiService.getAllPosts()
             if (!response.isSuccessful) {
                 throw AppError.fromThrowable(
-                    retrofit2.HttpException(response)
+                    HttpException(response)
                 )
             }
             return response.body() ?: emptyList()
@@ -29,7 +30,7 @@ class PostRepository @Inject constructor(
             val response = apiService.likePost(id)
             if (!response.isSuccessful) {
                 throw AppError.fromThrowable(
-                    retrofit2.HttpException(response)
+                    HttpException(response)
                 )
             }
             return response.body() ?: throw Exception("Empty response")
@@ -43,7 +44,7 @@ class PostRepository @Inject constructor(
             val response = apiService.dislikePost(id)
             if (!response.isSuccessful) {
                 throw AppError.fromThrowable(
-                    retrofit2.HttpException(response)
+                    HttpException(response)
                 )
             }
             return response.body() ?: throw Exception("Empty response")
@@ -57,7 +58,7 @@ class PostRepository @Inject constructor(
             val response = apiService.savePost(post)
             if (!response.isSuccessful) {
                 throw AppError.fromThrowable(
-                    retrofit2.HttpException(response)
+                    HttpException(response)
                 )
             }
             return response.body() ?: throw Exception("Empty response")
@@ -71,7 +72,7 @@ class PostRepository @Inject constructor(
             val response = apiService.deletePost(id)
             if (!response.isSuccessful) {
                 throw AppError.fromThrowable(
-                    retrofit2.HttpException(response)
+                    HttpException(response)
                 )
             }
         } catch (e: Exception) {

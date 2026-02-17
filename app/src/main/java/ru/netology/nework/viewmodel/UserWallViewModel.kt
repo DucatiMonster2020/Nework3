@@ -11,6 +11,7 @@ import ru.netology.nework.dto.Post
 import ru.netology.nework.dto.User
 import ru.netology.nework.error.AppError
 import ru.netology.nework.repository.PostRepository
+import ru.netology.nework.utils.SingleLiveEvent
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,6 +19,7 @@ class UserWallViewModel @Inject constructor(
     private val apiService: ApiService,
     private val postRepository: PostRepository
 ) : ViewModel() {
+
     private val _posts = MutableLiveData<List<Post>>(emptyList())
     val posts: LiveData<List<Post>> = _posts
 
@@ -30,14 +32,13 @@ class UserWallViewModel @Inject constructor(
     private val _loading = MutableLiveData(false)
     val loading: LiveData<Boolean> = _loading
 
-    private val _error = MutableLiveData<String?>()
-    val error: LiveData<String?> = _error
+    private val _error = SingleLiveEvent<AppError>()
+    val error: LiveData<AppError> = _error
 
     fun loadUserWall(userId: Long) {
         viewModelScope.launch {
             try {
                 _loading.value = true
-                _error.value = null
 
                 val userResponse = apiService.getUserById(userId)
                 if (userResponse.isSuccessful) {
@@ -50,10 +51,13 @@ class UserWallViewModel @Inject constructor(
                     _posts.value = wallPosts
                     determineLastJob(wallPosts)
                 } else {
-                    _error.value = "Не удалось загрузить стену пользователя"
+                    _error.value = AppError.ApiError(
+                        code = wallResponse.code(),
+                        message = "Ошибка загрузки стены: ${wallResponse.code()}"
+                    )
                 }
             } catch (e: Exception) {
-                _error.value = AppError.fromThrowable(e).message ?: "Ошибка загрузки"
+                _error.value = AppError.fromThrowable(e)
             } finally {
                 _loading.value = false
             }
@@ -81,7 +85,7 @@ class UserWallViewModel @Inject constructor(
                     _posts.value = updatedPosts
                 }
             } catch (e: Exception) {
-                _error.value = "Не удалось поставить лайк"
+                _error.value = AppError.fromThrowable(e)
             }
         }
     }
@@ -94,7 +98,7 @@ class UserWallViewModel @Inject constructor(
                 val updatedPosts = currentPosts.filter { it.id != postId }
                 _posts.value = updatedPosts
             } catch (e: Exception) {
-                _error.value = "Не удалось удалить пост"
+                _error.value = AppError.fromThrowable(e)
             }
         }
     }

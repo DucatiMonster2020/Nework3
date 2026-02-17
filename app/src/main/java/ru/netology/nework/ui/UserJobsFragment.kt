@@ -4,31 +4,43 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import ru.netology.nework.R
 import ru.netology.nework.adapter.JobsAdapter
-import ru.netology.nework.auth.AppAuth
 import ru.netology.nework.databinding.FragmentUserJobsBinding
+import ru.netology.nework.dto.Job
+import ru.netology.nework.error.AppError
+import ru.netology.nework.utils.Constants.ARG_IS_CURRENT_USER
+import ru.netology.nework.utils.Constants.ARG_USER_ID
 import ru.netology.nework.viewmodel.UserJobsViewModel
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class UserJobsFragment : Fragment() {
 
-    companion object {
-        private const val ARG_USER_ID = "user_id"
-        private const val ARG_IS_CURRENT_USER = "is_current_user"
+    private var _binding: FragmentUserJobsBinding? = null
+    private val binding get() = _binding!!
 
+    private val viewModel by viewModels<UserJobsViewModel>()
+    private var userId: Long = 0
+    private var isCurrentUser: Boolean = false
+
+    private val adapter by lazy {
+        JobsAdapter(
+            onItemClickListener = { job ->
+                if (isCurrentUser && job.ownedByMe) {
+                    showJobMenu(job)
+                }
+            }
+        )
+    }
+
+    companion object {
         fun newInstance(userId: Long, isCurrentUser: Boolean = false): UserJobsFragment {
             return UserJobsFragment().apply {
                 arguments = Bundle().apply {
@@ -38,24 +50,6 @@ class UserJobsFragment : Fragment() {
             }
         }
     }
-
-    @Inject
-    lateinit var appAuth: AppAuth
-
-    private val viewModel by viewModels<UserJobsViewModel>()
-    private var _binding: FragmentUserJobsBinding? = null
-    private val binding get() = _binding!!
-
-    private val adapter by lazy {
-        JobsAdapter(
-            onItemClickListener = { job ->
-                Snackbar.make(binding.root, "${job.name}: ${job.position}", Snackbar.LENGTH_SHORT).show()
-            }
-        )
-    }
-
-    private var userId: Long = 0
-    private var isCurrentUser: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,99 +71,64 @@ class UserJobsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupToolbar()
         setupRecyclerView()
         setupObservers()
-        setupListeners()
         loadJobs()
-    }
-
-    private fun setupToolbar() {
-        (activity as? AppCompatActivity)?.apply {
-            setSupportActionBar(binding.toolbar)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.title = getString(R.string.user_jobs)
-        }
-        binding.toolbar.setNavigationOnClickListener {
-            if (!findNavController().popBackStack()) {
-                activity?.onBackPressed()
-            }
-        }
     }
 
     private fun setupRecyclerView() {
         binding.jobsList.layoutManager = LinearLayoutManager(requireContext())
         binding.jobsList.adapter = adapter
-        binding.jobsList.addItemDecoration(
-            DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
-        )
     }
 
     private fun setupObservers() {
         viewModel.jobs.observe(viewLifecycleOwner) { jobs ->
             adapter.submitList(jobs)
             binding.emptyState.isVisible = jobs.isEmpty()
-            updateToolbarTitle(jobs.size)
+            binding.jobsList.isVisible = jobs.isNotEmpty()
         }
 
         viewModel.loading.observe(viewLifecycleOwner) { loading ->
             binding.progressBar.isVisible = loading
-            binding.swipeRefresh.isRefreshing = loading
         }
 
         viewModel.error.observe(viewLifecycleOwner) { error ->
-            error?.let {
-                Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG)
-                    .setAction(R.string.retry) { loadJobs() }
-                    .show()
-            }
-        }
-    }
-
-    private fun setupListeners() {
-        binding.swipeRefresh.setOnRefreshListener {
-            refreshJobs()
-        }
-
-        binding.addJobFab.apply {
-            isVisible = isCurrentUser
-            setOnClickListener {
-                Snackbar.make(binding.root, "Добавить работу", Snackbar.LENGTH_SHORT).show()
-            }
-        }
-
-        binding.retryButton.setOnClickListener {
-            loadJobs()
+            error?.let { showError(it) }
         }
     }
 
     private fun loadJobs() {
-        lifecycleScope.launch {
-            viewModel.loadJobs(userId)
-        }
+        viewModel.loadJobs(userId)
     }
 
-    private fun refreshJobs() {
-        lifecycleScope.launch {
-            viewModel.refreshJobs(userId)
-        }
+    private fun showJobMenu(job: Job) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(job.name)
+            .setItems(arrayOf(getString(R.string.delete))) { _, _ ->
+                confirmDeleteJob(job.id)
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
-    private fun updateToolbarTitle(jobsCount: Int) {
-        if (!isAdded) return
-        val title = when (jobsCount) {
-            0 -> getString(R.string.user_jobs)
-            1 -> "1 работа"
-            in 2..4 -> "$jobsCount работы"
-            else -> "$jobsCount работ"
-        }
-        (activity as? AppCompatActivity)?.supportActionBar?.title = title
+    private fun confirmDeleteJob(jobId: Long) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.delete_job)
+            .setMessage(R.string.delete_job_confirmation)
+            .setPositiveButton(R.string.delete) { _, _ ->
+                viewModel.deleteJob(jobId)
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
-    override fun onResume() {
-        super.onResume()
-        refreshJobs()
+    private fun showError(error: AppError) {
+        val message = when (error) {
+            is AppError.ApiError -> error.message ?: "Ошибка загрузки"
+            is AppError.NetworkError -> "Нет соединения с сетью"
+            else -> error.message ?: "Неизвестная ошибка"
+        }
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

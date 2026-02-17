@@ -2,17 +2,19 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Theme.NeWork" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">#4F378B</item>
-        <item name="colorPrimaryDark">#4F378B</item>
-        <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="colorSecondary">#6750A4</item>
-        <item name="colorOnSecondary">#FFFFFF</item>
-        <item name="colorSurface">#FFFFFF</item>
-        <item name="colorOnSurface">#000000</item>
-        <item name="android:windowBackground">#FFFFFF</item>
-        <item name="colorOnBackground">#000000</item>
-        <item name="colorError">#B3261E</item>
-        <item name="colorOnError">#FFFFFF</item>
+
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_variant</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorSecondaryVariant">@color/secondary_variant</item>
+        <item name="colorOnSecondary">@color/on_secondary</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/on_surface</item>
+        <item name="android:windowBackground">@color/background</item>
+        <item name="colorOnBackground">@color/on_background</item>
+        <item name="colorError">@color/error</item>
+        <item name="colorOnError">@color/on_error</item>
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
         <item name="actionBarSize">64dp</item>
@@ -20,37 +22,15 @@
         <item name="materialButtonOutlinedStyle">@style/Widget.NeWork.Button.Outlined</item>
         <item name="bottomNavigationStyle">@style/Widget.NeWork.BottomNavigationView</item>
     </style>
-    <style name="Widget.NeWork.Toolbar" parent="Widget.AppCompat.Toolbar">
-        <item name="titleTextColor">@android:color/white</item>
-        <item name="subtitleTextColor">@android:color/white</item>
-        <item name="navigationIconTint">@android:color/white</item>
-        <item name="android:minHeight">64dp</item>
-        <item name="background">?attr/colorPrimary</item>
-    </style>
-    <style name="Widget.NeWork.Button" parent="Widget.MaterialComponents.Button">
-        <item name="backgroundTint">?attr/colorSecondary</item>
-        <item name="android:textColor">?attr/colorOnSecondary</item>
-        <item name="cornerRadius">100dp</item>
-        <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingBottom">12dp</item>
-        <item name="android:paddingStart">24dp</item>
-        <item name="android:paddingEnd">24dp</item>
-    </style>
-    <style name="Widget.NeWork.Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="strokeColor">?attr/colorSecondary</item>
-        <item name="strokeWidth">1dp</item>
-        <item name="android:textColor">?attr/colorSecondary</item>
-        <item name="cornerRadius">100dp</item>
-        <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingBottom">12dp</item>
-        <item name="android:paddingStart">24dp</item>
-        <item name="android:paddingEnd">24dp</item>
-    </style>
-    <style name="Widget.NeWork.BottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
-        <item name="itemIconTint">@drawable/bottom_nav_icon_colors</item>
-        <item name="itemTextColor">@drawable/bottom_nav_text_colors</item>
-        <item name="android:background">@android:color/white</item>
-        <item name="labelVisibilityMode">labeled</item>
+
+    <style name="ThemeOverlay.App.Dialog.FullScreen" parent="ThemeOverlay.MaterialComponents.Dialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowMinWidthMajor">100%</item>
+        <item name="android:windowMinWidthMinor">100%</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowEnterAnimation">@android:anim/slide_in_left</item>
+        <item name="android:windowExitAnimation">@android:anim/slide_out_right</item>
     </style>
 
 </resources>

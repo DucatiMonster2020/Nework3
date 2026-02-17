@@ -1,5 +1,6 @@
 package ru.netology.nework.repository
 
+import retrofit2.HttpException
 import ru.netology.nework.api.ApiService
 import ru.netology.nework.dto.Event
 import ru.netology.nework.error.AppError
@@ -15,7 +16,7 @@ class EventRepository @Inject constructor(
             val response = apiService.getAllEvents()
             if (!response.isSuccessful) {
                 throw AppError.fromThrowable(
-                    retrofit2.HttpException(response)
+                    HttpException(response)
                 )
             }
             return response.body() ?: emptyList()
@@ -29,7 +30,7 @@ class EventRepository @Inject constructor(
             val response = apiService.likeEvent(id)
             if (!response.isSuccessful) {
                 throw AppError.fromThrowable(
-                    retrofit2.HttpException(response)
+                    HttpException(response)
                 )
             }
             return response.body() ?: throw Exception("Empty response")
@@ -43,7 +44,7 @@ class EventRepository @Inject constructor(
             val response = apiService.dislikeEvent(id)
             if (!response.isSuccessful) {
                 throw AppError.fromThrowable(
-                    retrofit2.HttpException(response)
+                    HttpException(response)
                 )
             }
             return response.body() ?: throw Exception("Empty response")
@@ -57,7 +58,7 @@ class EventRepository @Inject constructor(
             val response = apiService.participateEvent(id)
             if (!response.isSuccessful) {
                 throw AppError.fromThrowable(
-                    retrofit2.HttpException(response)
+                    HttpException(response)
                 )
             }
             return response.body() ?: throw Exception("Empty response")
@@ -71,7 +72,7 @@ class EventRepository @Inject constructor(
             val response = apiService.cancelParticipation(id)
             if (!response.isSuccessful) {
                 throw AppError.fromThrowable(
-                    retrofit2.HttpException(response)
+                    HttpException(response)
                 )
             }
             return response.body() ?: throw Exception("Empty response")
@@ -85,7 +86,7 @@ class EventRepository @Inject constructor(
             val response = apiService.saveEvent(event)
             if (!response.isSuccessful) {
                 throw AppError.fromThrowable(
-                    retrofit2.HttpException(response)
+                    HttpException(response)
                 )
             }
             return response.body() ?: throw Exception("Empty response")
@@ -99,7 +100,7 @@ class EventRepository @Inject constructor(
             val response = apiService.deleteEvent(id)
             if (!response.isSuccessful) {
                 throw AppError.fromThrowable(
-                    retrofit2.HttpException(response)
+                    HttpException(response)
                 )
             }
         } catch (e: Exception) {

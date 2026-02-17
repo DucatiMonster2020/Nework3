@@ -6,9 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import ru.netology.nework.error.AppError
 import ru.netology.nework.model.FeedModel
-import ru.netology.nework.model.FeedModelState
 import ru.netology.nework.repository.PostRepository
+import ru.netology.nework.utils.SingleLiveEvent
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,8 +20,8 @@ class PostsViewModel @Inject constructor(
     private val _dataState = MutableLiveData(FeedModel())
     val dataState: LiveData<FeedModel> = _dataState
 
-    private val _state = MutableLiveData<FeedModelState>(FeedModelState.IDLE)
-    val state: LiveData<FeedModelState> = _state
+    private val _error = SingleLiveEvent<AppError>()
+    val error: LiveData<AppError> = _error
 
     init {
         loadPosts()
@@ -28,32 +29,42 @@ class PostsViewModel @Inject constructor(
 
     fun loadPosts() {
         viewModelScope.launch {
+            _dataState.value = _dataState.value?.copy(loading = true)
             try {
-                _state.value = FeedModelState.LOADING
                 val posts = repository.getAll()
                 _dataState.value = FeedModel(
                     posts = posts,
-                    empty = posts.isEmpty()
+                    empty = posts.isEmpty(),
+                    loading = false
                 )
-                _state.value = FeedModelState.IDLE
             } catch (e: Exception) {
-                _state.value = FeedModelState.error(e.message ?: "Unknown error")
+                val error = AppError.fromThrowable(e)
+                _dataState.value = _dataState.value?.copy(
+                    loading = false,
+                    error = error
+                )
+                _error.value = error
             }
         }
     }
 
     fun refreshPosts() {
         viewModelScope.launch {
+            _dataState.value = _dataState.value?.copy(refreshing = true)
             try {
-                _state.value = FeedModelState.REFRESHING
                 val posts = repository.getAll()
                 _dataState.value = FeedModel(
                     posts = posts,
-                    empty = posts.isEmpty()
+                    empty = posts.isEmpty(),
+                    refreshing = false
                 )
-                _state.value = FeedModelState.IDLE
             } catch (e: Exception) {
-                _state.value = FeedModelState.error(e.message ?: "Unknown error")
+                val error = AppError.fromThrowable(e)
+                _dataState.value = _dataState.value?.copy(
+                    refreshing = false,
+                    error = error
+                )
+                _error.value = error
             }
         }
     }
@@ -61,32 +72,12 @@ class PostsViewModel @Inject constructor(
     fun likeById(id: Long) {
         viewModelScope.launch {
             try {
+                val post = repository.likeById(id)
                 val currentPosts = _dataState.value?.posts ?: emptyList()
-                val post = currentPosts.find { it.id == id }
-                post?.let { originalPost ->
-                    val updatedPost = originalPost.copy(
-                        likedByMe = !originalPost.likedByMe,
-                        likeOwnerIds = if (originalPost.likedByMe) {
-                            originalPost.likeOwnerIds - 999 // ваш ID
-                        } else {
-                            originalPost.likeOwnerIds + 999
-                        }
-                    )
-
-                    val newPosts = currentPosts.map {
-                        if (it.id == id) updatedPost else it
-                    }
-
-                    _dataState.value = _dataState.value?.copy(posts = newPosts)
-                    if (updatedPost.likedByMe) {
-                        repository.likeById(id)
-                    } else {
-                        repository.dislikeById(id)
-                    }
-                }
+                val newPosts = currentPosts.map { if (it.id == id) post else it }
+                _dataState.value = _dataState.value?.copy(posts = newPosts)
             } catch (e: Exception) {
-                _state.value = FeedModelState.error("Failed to like post")
-                loadPosts()
+                _error.value = AppError.fromThrowable(e)
             }
         }
     }
@@ -99,7 +90,7 @@ class PostsViewModel @Inject constructor(
                 _dataState.value = _dataState.value?.copy(posts = newPosts)
                 repository.removeById(id)
             } catch (e: Exception) {
-                _state.value = FeedModelState.error("Failed to delete post")
+                _error.value = AppError.fromThrowable(e)
                 loadPosts()
             }
         }

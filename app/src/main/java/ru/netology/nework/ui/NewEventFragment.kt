@@ -22,6 +22,14 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.netology.nework.R
 import ru.netology.nework.databinding.FragmentNewEventBinding
+import ru.netology.nework.dto.Coordinates
+import ru.netology.nework.dto.User
+import ru.netology.nework.error.AppError
+import ru.netology.nework.utils.Constants.ARG_EVENT_ID
+import ru.netology.nework.utils.Constants.LOCATION_LAT
+import ru.netology.nework.utils.Constants.LOCATION_LNG
+import ru.netology.nework.utils.Constants.LOCATION_REQUEST_KEY
+import ru.netology.nework.utils.CoordinatesUtils.formatCoordinates
 import ru.netology.nework.viewmodel.NewEventViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -39,6 +47,10 @@ class NewEventFragment : Fragment() {
     private var selectedAttachmentUri: Uri? = null
     private var attachmentType: String? = null
     private var eventDate: Date? = null
+    private var selectedCoords: Coordinates? = null
+    private var currentEventId = 0L
+    private var isEditMode = false
+    private val selectedSpeakers = mutableListOf<User>()
 
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
@@ -51,6 +63,7 @@ class NewEventFragment : Fragment() {
             binding.removeAttachmentButton.isVisible = true
         }
     }
+
     private val pickVideoLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
@@ -61,6 +74,7 @@ class NewEventFragment : Fragment() {
             binding.removeAttachmentButton.isVisible = true
         }
     }
+
     private val pickAudioLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
@@ -75,6 +89,11 @@ class NewEventFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+
+        arguments?.let {
+            currentEventId = it.getLong(ARG_EVENT_ID, 0L)
+            isEditMode = currentEventId != 0L
+        }
     }
 
     override fun onCreateView(
@@ -105,13 +124,15 @@ class NewEventFragment : Fragment() {
 
         setupListeners()
         setupObservers()
+        setupFragmentResultListener()
     }
 
     private fun setupListeners() {
         binding.locationButton.setOnClickListener {
-            Snackbar.make(binding.root, "Выбор локации", Snackbar.LENGTH_SHORT).show()
+            findNavController().navigate(R.id.action_newEventFragment_to_mapFragment)
         }
-        binding.eventTypeGroup.setOnCheckedChangeListener { group, checkedId ->
+
+        binding.eventTypeGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.onlineRadio -> {
                     binding.locationButton.isVisible = false
@@ -121,31 +142,35 @@ class NewEventFragment : Fragment() {
                 }
             }
         }
-        val isOnline = binding.onlineRadio.isChecked
+
         binding.dateButton.setOnClickListener {
             showDateTimePicker()
         }
+
         binding.photoButton.setOnClickListener {
             pickImageLauncher.launch("image/*")
         }
+
         binding.galleryButton.setOnClickListener {
             pickImageLauncher.launch("image/*")
         }
+
         binding.audioButton.setOnClickListener {
             pickAudioLauncher.launch("audio/*")
         }
+
         binding.videoButton.setOnClickListener {
             pickVideoLauncher.launch("video/*")
         }
+
         binding.speakersButton.setOnClickListener {
-            Snackbar.make(binding.root, "Выбор спикеров", Snackbar.LENGTH_SHORT).show()
+            navigateToUsersSelection()
         }
+
         binding.removeAttachmentButton.setOnClickListener {
-            selectedAttachmentUri = null
-            attachmentType = null
-            binding.attachmentType.text = "Вложение не выбрано"
-            binding.removeAttachmentButton.isVisible = false
+            clearAttachment()
         }
+
         binding.linkButton.setOnClickListener {
             binding.linkInput.isVisible = !binding.linkInput.isVisible
         }
@@ -158,9 +183,7 @@ class NewEventFragment : Fragment() {
         }
 
         viewModel.error.observe(viewLifecycleOwner) { error ->
-            error?.let {
-                Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).show()
-            }
+            error?.let { showError(it) }
         }
 
         viewModel.success.observe(viewLifecycleOwner) { success ->
@@ -168,6 +191,30 @@ class NewEventFragment : Fragment() {
                 findNavController().popBackStack()
             }
         }
+    }
+
+    private fun setupFragmentResultListener() {
+        parentFragmentManager.setFragmentResultListener(
+            LOCATION_REQUEST_KEY,
+            viewLifecycleOwner
+        ) { requestKey, result ->
+            if (requestKey == LOCATION_REQUEST_KEY) {
+                val lat = result.getDouble(LOCATION_LAT)
+                val lng = result.getDouble(LOCATION_LNG)
+
+                if (lat != 0.0 && lng != 0.0) {
+                    selectedCoords = Coordinates(lat, lng)
+                    updateLocationButton(selectedCoords!!)
+                }
+            }
+        }
+    }
+
+    private fun navigateToUsersSelection() {
+        val dialog = UsersSelectionDialogFragment.newInstance(
+            selectedSpeakers.map { it.id }.toLongArray()
+        )
+        dialog.show(parentFragmentManager, "speakers_selection")
     }
 
     private fun showDateTimePicker() {
@@ -207,6 +254,24 @@ class NewEventFragment : Fragment() {
             binding.dateButton.text = formatter.format(date)
         }
     }
+
+    private fun updateLocationButton(coords: Coordinates) {
+        binding.locationButton.apply {
+            text = "Место: ${formatCoordinates(coords)}"
+            setCompoundDrawablesRelativeWithIntrinsicBounds(
+                R.drawable.ic_check, 0, 0, 0
+            )
+        }
+    }
+
+    private fun clearAttachment() {
+        selectedImageUri = null
+        selectedAttachmentUri = null
+        attachmentType = null
+        binding.attachmentType.text = "Вложение не выбрано"
+        binding.removeAttachmentButton.isVisible = false
+    }
+
     private fun saveEvent() {
         val content = binding.content.text.toString().trim()
 
@@ -221,21 +286,33 @@ class NewEventFragment : Fragment() {
         }
 
         val isOnline = binding.onlineRadio.isChecked
+        // Исправлено: используем правильный ID - linkInput
         val link = if (binding.linkInput.isVisible) {
-            binding.linkInput.editText?.text.toString().trim()
+            binding.linkInput.editText?.text?.toString()?.trim()
         } else {
             null
         }
+
         lifecycleScope.launch {
             viewModel.saveEvent(
                 content = content,
                 datetime = eventDate!!,
                 isOnline = isOnline,
                 link = link,
-                attachmentUri = selectedAttachmentUri,
-                attachmentType = attachmentType
+                coords = if (!isOnline) selectedCoords else null,
+                speakerIds = selectedSpeakers.map { it.id }
             )
         }
+    }
+
+    private fun showError(error: AppError) {
+        val message = when (error) {
+            is AppError.ApiError -> error.message ?: "Ошибка сервера"
+            is AppError.NetworkError -> "Нет соединения с сетью"
+            is AppError.ValidationError -> "Ошибка валидации"
+            else -> error.message ?: "Неизвестная ошибка"
+        }
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
     }
 
     override fun onDestroyView() {

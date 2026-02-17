@@ -6,6 +6,8 @@ object Constants {
     const val ARG_USER_ID = "userId"
     const val ARG_IS_CURRENT_USER = "isCurrentUser"
 
+    const val ARG_SELECTED_IDS = "selectedUserIds"
+
     const val LOCATION_REQUEST_KEY = "location_request_key"
     const val LOCATION_LAT = "lat"
     const val LOCATION_LNG = "lng"
